@@ -13,7 +13,7 @@
 import {ActionButtonStyleProps, btnStyles} from './ActionButton';
 import {centerBaseline} from './CenterBaseline';
 import {ContextValue, Provider, ToggleButton as RACToggleButton, ToggleButtonProps as RACToggleButtonProps, useSlottedContext} from 'react-aria-components';
-import {createContext, forwardRef, ReactNode} from 'react';
+import {createContext, forwardRef, ReactNode, useMemo} from 'react';
 import {FocusableRef, FocusableRefValue, GlobalDOMAttributes} from '@react-types/shared';
 import {fontRelative, style} from '../style' with {type: 'macro'};
 import {IconContext} from './Icon';
@@ -78,11 +78,11 @@ export const ToggleButton = forwardRef(function ToggleButton(props: ToggleButton
       <Provider
         values={[
           [SkeletonContext, null],
-          [TextContext, {styles: style({paddingY: '--labelPadding', order: 1, truncate: true})}],
-          [IconContext, {
+          [TextContext, useMemo(() => ({styles: style({paddingY: '--labelPadding', order: 1, truncate: true})}), [])],
+          [IconContext, useMemo(() => ({
             render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
             styles: style({size: fontRelative(20), marginStart: '--iconMargin', flexShrink: 0})
-          }]
+          }), [])]
         ]}>
         {typeof props.children === 'string' ? <Text>{props.children}</Text> : props.children}
       </Provider>

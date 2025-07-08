@@ -21,7 +21,7 @@ import {GlobalDOMAttributes} from '@react-types/shared';
 import {GroupContext} from './Group';
 import {InputContext} from './Input';
 import {LabelContext} from './Label';
-import React, {createContext, ForwardedRef, useRef} from 'react';
+import React, {createContext, ForwardedRef, useMemo, useRef} from 'react';
 import {SearchFieldState, useSearchFieldState} from 'react-stately';
 import {TextContext} from './Text';
 
@@ -99,16 +99,16 @@ export const SearchField = /*#__PURE__*/ createHideableComponent(function Search
       data-invalid={validation.isInvalid || undefined}>
       <Provider
         values={[
-          [LabelContext, {...labelProps, ref: labelRef}],
-          [InputContext, {...mergeProps(inputProps, inputContextProps), ref: mergedInputRef}],
+          [LabelContext, useMemo(() => ({...labelProps, ref: labelRef}), [labelProps, labelRef])],
+          [InputContext, useMemo(() => ({...mergeProps(inputProps, inputContextProps), ref: mergedInputRef}), [inputContextProps, inputProps, mergedInputRef])],
           [ButtonContext, clearButtonProps],
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             slots: {
               description: descriptionProps,
               errorMessage: errorMessageProps
             }
-          }],
-          [GroupContext, {isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false}],
+          }), [descriptionProps, errorMessageProps])],
+          [GroupContext, useMemo(() => ({isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false}), [props.isDisabled, validation.isInvalid])],
           [FieldErrorContext, validation]
         ]}>
         {renderProps.children}

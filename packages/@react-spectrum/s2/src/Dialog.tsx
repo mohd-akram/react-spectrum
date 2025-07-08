@@ -15,7 +15,7 @@ import {CloseButton} from './CloseButton';
 import {composeRenderProps, OverlayTriggerStateContext, Provider, Dialog as RACDialog, DialogProps as RACDialogProps} from 'react-aria-components';
 import {ContentContext, FooterContext, HeaderContext, HeadingContext} from './Content';
 import {DOMRef, GlobalDOMAttributes} from '@react-types/shared';
-import {forwardRef} from 'react';
+import {forwardRef, useMemo} from 'react';
 import {ImageContext} from './Image';
 import {Modal} from './Modal';
 import {style} from '../style' with {type: 'macro'};
@@ -99,6 +99,15 @@ export const Dialog = forwardRef(function Dialog(props: DialogProps, ref: DOMRef
   let {size = 'M', isDismissible, isKeyboardDismissDisabled} = props;
   let domRef = useDOMRef(ref);
 
+  const headerContext = useMemo(() => ({styles: header}), []);
+  const headingContext = useMemo(() => ({styles: heading}), []);
+  const footerContext = useMemo(() => ({styles: footer}), []);
+  const contentContext = useMemo(() => ({styles: content}), []);
+  const imageContext = useMemo(() => ({styles: image}), []);
+  const hiddenImageContext = useMemo(() => ({hidden: true}), []);
+  const isHiddenContext = useMemo(() => ({isHidden: true}), []);
+  const buttonGroupContext = useMemo(() => ({isHidden: props.isDismissible, styles: buttonGroup, align: 'end'} as const), [props.isDismissible]);
+
   return (
     <Modal size={size} isDismissable={isDismissible} isKeyboardDismissDisabled={isKeyboardDismissDisabled}>
       <RACDialog
@@ -114,12 +123,12 @@ export const Dialog = forwardRef(function Dialog(props: DialogProps, ref: DOMRef
             {/* Hero image */}
             <Provider
               values={[
-                [ImageContext, {styles: image}],
-                [HeadingContext, {isHidden: true}],
-                [HeaderContext, {isHidden: true}],
-                [ContentContext, {isHidden: true}],
-                [FooterContext, {isHidden: true}],
-                [ButtonGroupContext, {isHidden: true}]
+                [ImageContext, imageContext],
+                [HeadingContext, isHiddenContext],
+                [HeaderContext, isHiddenContext],
+                [ContentContext, isHiddenContext],
+                [FooterContext, isHiddenContext],
+                [ButtonGroupContext, isHiddenContext]
               ]}>
               {children}
             </Provider>
@@ -168,29 +177,29 @@ export const Dialog = forwardRef(function Dialog(props: DialogProps, ref: DOMRef
                 })}>
                 <Provider
                   values={[
-                    [ImageContext, {hidden: true}],
-                    [HeadingContext, {styles: heading}],
-                    [HeaderContext, {styles: header}],
-                    [ContentContext, {isHidden: true}],
-                    [FooterContext, {isHidden: true}],
-                    [ButtonGroupContext, {isHidden: true}]
+                    [ImageContext, hiddenImageContext],
+                    [HeadingContext, headingContext],
+                    [HeaderContext, headerContext],
+                    [ContentContext, isHiddenContext],
+                    [FooterContext, isHiddenContext],
+                    [ButtonGroupContext, isHiddenContext]
                   ]}>
                   {children}
                 </Provider>
               </div>
-              {props.isDismissible && 
+              {props.isDismissible &&
                 <CloseButton styles={style({marginBottom: 12})} />
               }
             </div>
             {/* Main content */}
             <Provider
               values={[
-                [ImageContext, {hidden: true}],
-                [HeadingContext, {isHidden: true}],
-                [HeaderContext, {isHidden: true}],
-                [ContentContext, {styles: content}],
-                [FooterContext, {isHidden: true}],
-                [ButtonGroupContext, {isHidden: true}]
+                [ImageContext, hiddenImageContext],
+                [HeadingContext, isHiddenContext],
+                [HeaderContext, isHiddenContext],
+                [ContentContext, contentContext],
+                [FooterContext, isHiddenContext],
+                [ButtonGroupContext, isHiddenContext]
               ]}>
               {children}
             </Provider>
@@ -214,12 +223,12 @@ export const Dialog = forwardRef(function Dialog(props: DialogProps, ref: DOMRef
               })}>
               <Provider
                 values={[
-                  [ImageContext, {hidden: true}],
-                  [HeadingContext, {isHidden: true}],
-                  [HeaderContext, {isHidden: true}],
-                  [ContentContext, {isHidden: true}],
-                  [FooterContext, {styles: footer}],
-                  [ButtonGroupContext, {isHidden: props.isDismissible, styles: buttonGroup, align: 'end'}]
+                  [ImageContext, hiddenImageContext],
+                  [HeadingContext, isHiddenContext],
+                  [HeaderContext, isHiddenContext],
+                  [ContentContext, isHiddenContext],
+                  [FooterContext, footerContext],
+                  [ButtonGroupContext, buttonGroupContext]
                 ]}>
                 {children}
               </Provider>

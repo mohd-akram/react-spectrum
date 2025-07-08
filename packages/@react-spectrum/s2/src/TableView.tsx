@@ -583,14 +583,16 @@ interface ColumnContentProps extends Pick<ColumnRenderProps, 'allowsSorting' | '
 function ColumnContents(props: ColumnContentProps) {
   let {allowsSorting, sortDirection, children} = props;
 
+  const iconContext = useMemo(() => ({
+    styles: sortIcon({})
+  }), []);
+
   return (
     <div className={columnContentWrapper}>
       {allowsSorting && (
         <Provider
           values={[
-            [IconContext, {
-              styles: sortIcon({})
-            }]
+            [IconContext, iconContext]
           ]}>
           {sortDirection != null && (
             sortDirection === 'ascending' ? <SortUpArrow /> : <SortDownArrow />
@@ -768,6 +770,10 @@ function ColumnWithMenu(props: ColumnWithMenuProps) {
     menuAlign = 'end';
   }
 
+  const iconContext = useMemo(() => ({
+    styles: sortIcon({isButton: true})
+  }), []);
+
   return (
     <>
       <MenuTrigger align={menuAlign}>
@@ -775,9 +781,7 @@ function ColumnWithMenu(props: ColumnWithMenuProps) {
           {allowsSorting && (
             <Provider
               values={[
-                [IconContext, {
-                  styles: sortIcon({isButton: true})
-                }]
+                [IconContext, iconContext]
               ]}>
               {sortDirection != null && (
                 sortDirection === 'ascending' ? <SortUpArrow /> : <SortDownArrow />

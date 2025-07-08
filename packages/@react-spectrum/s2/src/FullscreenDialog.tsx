@@ -14,7 +14,7 @@ import {ButtonGroupContext} from './ButtonGroup';
 import {composeRenderProps, OverlayTriggerStateContext, Provider, Dialog as RACDialog, DialogProps as RACDialogProps} from 'react-aria-components';
 import {ContentContext, HeaderContext, HeadingContext} from './Content';
 import {DOMRef, GlobalDOMAttributes} from '@react-types/shared';
-import {forwardRef} from 'react';
+import {forwardRef, useMemo} from 'react';
 import {Modal} from './Modal';
 import {style} from '../style' with {type: 'macro'};
 import {StyleProps} from './style-utils';
@@ -123,7 +123,10 @@ export const dialogInner = style({
 export const FullscreenDialog = forwardRef(function FullscreenDialog(props: FullscreenDialogProps, ref: DOMRef) {
   let {variant = 'fullscreen', isKeyboardDismissDisabled} = props;
   let domRef = useDOMRef(ref);
-
+  const headingContext = useMemo(() => ({styles: heading}), []);
+  const headerContext = useMemo(() => ({styles: header}), []);
+  const contentContext = useMemo(() => ({styles: content}), []);
+  const buttonGroupContext = useMemo(() => ({styles: buttonGroup}), []);
   return (
     <Modal size={variant} isKeyboardDismissDisabled={isKeyboardDismissDisabled}>
       <RACDialog
@@ -136,10 +139,10 @@ export const FullscreenDialog = forwardRef(function FullscreenDialog(props: Full
           <OverlayTriggerStateContext.Provider value={null}>
             <Provider
               values={[
-                [HeadingContext, {styles: heading}],
-                [HeaderContext, {styles: header}],
-                [ContentContext, {styles: content}],
-                [ButtonGroupContext, {styles: buttonGroup}]
+                [HeadingContext, headingContext],
+                [HeaderContext, headerContext],
+                [ContentContext, contentContext],
+                [ButtonGroupContext, buttonGroupContext]
               ]}>
               {children}
             </Provider>
@@ -149,4 +152,3 @@ export const FullscreenDialog = forwardRef(function FullscreenDialog(props: Full
     </Modal>
   );
 });
-

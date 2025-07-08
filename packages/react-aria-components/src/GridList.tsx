@@ -244,8 +244,8 @@ function GridListInner<T extends object>({props, collection, gridListRef: ref}: 
         <Provider
           values={[
             [ListStateContext, state],
-            [DragAndDropContext, {dragAndDropHooks, dragState, dropState}],
-            [DropIndicatorContext, {render: GridListDropIndicatorWrapper}]
+            [DragAndDropContext, useMemo(() => ({dragAndDropHooks, dragState, dropState}), [dragAndDropHooks, dragState, dropState])],
+            [DropIndicatorContext, useMemo(() => ({render: GridListDropIndicatorWrapper}), [])]
           ]}>
           {isListDroppable && <RootDropIndicator />}
           <CollectionRoot
@@ -309,8 +309,6 @@ export const GridListItem = /*#__PURE__*/ createLeafComponent('item', function G
     {key: item.key},
     state
   );
-
-  let buttonProps = state.selectionManager.disabledBehavior === 'all' && states.isDisabled ? {isDisabled: true} : {};
 
   let draggableItem: DraggableItemResult | null = null;
   if (dragState && dragAndDropHooks) {
@@ -387,30 +385,33 @@ export const GridListItem = /*#__PURE__*/ createLeafComponent('item', function G
         <div {...gridCellProps} style={{display: 'contents'}}>
           <Provider
             values={[
-              [CheckboxContext, {
+              [CheckboxContext, useMemo(() => ({
                 slots: {
                   [DEFAULT_SLOT]: {},
                   selection: checkboxProps
                 }
-              }],
-              [ButtonContext, {
-                slots: {
-                  [DEFAULT_SLOT]: buttonProps,
-                  drag: {
-                    ...draggableItem?.dragButtonProps,
-                    ref: dragButtonRef,
-                    style: {
-                      pointerEvents: 'none'
+              }), [checkboxProps])],
+              [ButtonContext, useMemo(() => {
+                let buttonProps = state.selectionManager.disabledBehavior === 'all' && states.isDisabled ? {isDisabled: true} : {};
+                return {
+                  slots: {
+                    [DEFAULT_SLOT]: buttonProps,
+                    drag: {
+                      ...draggableItem?.dragButtonProps,
+                      ref: dragButtonRef,
+                      style: {
+                        pointerEvents: 'none'
+                      }
                     }
                   }
-                }
-              }],
-              [TextContext, {
+                } as const;
+              }, [draggableItem?.dragButtonProps, state.selectionManager.disabledBehavior, states.isDisabled])],
+              [TextContext, useMemo(() => ({
                 slots: {
                   [DEFAULT_SLOT]: {},
                   description: descriptionProps
                 }
-              }],
+              }), [descriptionProps])],
               [CollectionRendererContext, DefaultCollectionRenderer],
               [ListStateContext, null]
             ]}>

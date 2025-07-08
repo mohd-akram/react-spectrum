@@ -16,7 +16,7 @@ import {baseColor, focusRing, fontRelative, lightDark, style} from '../style' wi
 import {ButtonProps, ButtonRenderProps, ContextValue, OverlayTriggerStateContext, Provider, Button as RACButton, useSlottedContext} from 'react-aria-components';
 import {centerBaseline} from './CenterBaseline';
 import {control, getAllowedOverrides, staticColor, StyleProps} from './style-utils' with { type: 'macro' };
-import {createContext, forwardRef, ReactNode, useContext} from 'react';
+import {createContext, forwardRef, ReactNode, useContext, useMemo} from 'react';
 import {FocusableRef, FocusableRefValue, GlobalDOMAttributes} from '@react-types/shared';
 import {IconContext} from './Icon';
 import {NotificationBadgeContext} from './NotificationBadge';
@@ -289,12 +289,12 @@ export const ActionButton = forwardRef(function ActionButton(props: ActionButton
       <Provider
         values={[
           [SkeletonContext, null],
-          [TextContext, {styles: style({order: 1, truncate: true})}],
-          [IconContext, {
+          [TextContext, useMemo(() => ({styles: style({order: 1, truncate: true})}), [])],
+          [IconContext, useMemo(() => ({
             render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
             styles: style({size: fontRelative(20), marginStart: '--iconMargin', flexShrink: 0})
-          }],
-          [AvatarContext, {
+          }), [])],
+          [AvatarContext, useMemo(() => ({
             size: avatarSize[size],
             styles: style({
               marginStart: {
@@ -304,13 +304,13 @@ export const ActionButton = forwardRef(function ActionButton(props: ActionButton
               flexShrink: 0,
               order: 0
             })
-          }],
-          [NotificationBadgeContext, {
+          }), [size])],
+          [NotificationBadgeContext, useMemo(() => ({
             staticColor: staticColor,
             size: props.size === 'XS' ? undefined : props.size,
             isDisabled: props.isDisabled,
             styles: style({position: 'absolute', top: '--badgeTop', insetStart: '--badgePosition', marginTop: 'calc((self(height) * -1)/2)', marginStart: 'calc((self(height) * -1)/2)'})
-          }]
+          }), [props.isDisabled, props.size, staticColor])]
         ]}>
         {typeof props.children === 'string' ? <Text>{props.children}</Text> : props.children}
       </Provider>

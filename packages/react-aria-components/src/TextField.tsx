@@ -20,7 +20,7 @@ import {GlobalDOMAttributes} from '@react-types/shared';
 import {GroupContext} from './Group';
 import {InputContext} from './Input';
 import {LabelContext} from './Label';
-import React, {createContext, ForwardedRef, useCallback, useRef, useState} from 'react';
+import React, {createContext, ForwardedRef, useCallback, useMemo, useRef, useState} from 'react';
 import {TextAreaContext} from './TextArea';
 import {TextContext} from './Text';
 
@@ -109,16 +109,16 @@ export const TextField = /*#__PURE__*/ createHideableComponent(function TextFiel
       data-required={props.isRequired || undefined}>
       <Provider
         values={[
-          [LabelContext, {...labelProps, ref: labelRef}],
-          [InputContext, {...mergeProps(inputProps, inputContextProps), ref: inputOrTextAreaRef}],
-          [TextAreaContext, {...inputProps, ref: inputOrTextAreaRef}],
-          [GroupContext, {role: 'presentation', isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false}],
-          [TextContext, {
+          [LabelContext, useMemo(() => ({...labelProps, ref: labelRef}), [labelProps, labelRef])],
+          [InputContext, useMemo(() => ({...mergeProps(inputProps, inputContextProps), ref: inputOrTextAreaRef}), [inputContextProps, inputOrTextAreaRef, inputProps])],
+          [TextAreaContext, useMemo(() => ({...inputProps, ref: inputOrTextAreaRef}), [inputOrTextAreaRef, inputProps])],
+          [GroupContext, useMemo(() => ({role: 'presentation', isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false} as const), [props.isDisabled, validation.isInvalid])],
+          [TextContext, useMemo(() => ({
             slots: {
               description: descriptionProps,
               errorMessage: errorMessageProps
             }
-          }],
+          }), [descriptionProps, errorMessageProps])],
           [FieldErrorContext, validation]
         ]}>
         {renderProps.children}

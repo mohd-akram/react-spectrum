@@ -12,7 +12,7 @@
 
 import AlertTriangle from '../s2wf-icons/S2_Icon_AlertTriangle_20_N.svg';
 import CheckmarkCircle from '../s2wf-icons/S2_Icon_CheckmarkCircle_20_N.svg';
-import {ComponentType, createContext, forwardRef, ReactNode, useEffect, useRef} from 'react';
+import {ComponentType, createContext, forwardRef, ReactNode, useEffect, useMemo, useRef} from 'react';
 import {ContentContext, HeadingContext} from './Content';
 import {ContextValue, Provider, SlotProps} from 'react-aria-components';
 import {DOMProps, DOMRef, DOMRefValue} from '@react-types/shared';
@@ -260,9 +260,9 @@ export const InlineAlert = /*#__PURE__*/ forwardRef(function InlineAlert(props: 
         className={grid}>
         <Provider
           values={[
-            [HeadingContext, {styles: heading({fillStyle})}],
-            [ContentContext, {styles: content({fillStyle})}],
-            [IconContext, {styles: icon({variant, fillStyle})}]
+            [HeadingContext, useMemo(() => ({styles: heading({fillStyle})}), [fillStyle])],
+            [ContentContext, useMemo(() => ({styles: content({fillStyle})}), [fillStyle])],
+            [IconContext, useMemo(() => ({styles: icon({variant, fillStyle})}), [fillStyle, variant])]
           ]}>
           {Icon && <Icon aria-label={iconAlt} />}
           {children}

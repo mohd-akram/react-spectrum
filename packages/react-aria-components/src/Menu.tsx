@@ -74,17 +74,17 @@ export function MenuTrigger(props: MenuTriggerProps): JSX.Element {
   return (
     <Provider
       values={[
-        [MenuContext, {...menuProps, ref: scrollRef}],
+        [MenuContext, useMemo(() => ({...menuProps, ref: scrollRef}), [menuProps])],
         [OverlayTriggerStateContext, state],
         [RootMenuTriggerStateContext, state],
-        [PopoverContext, {
+        [PopoverContext, useMemo(() => ({
           trigger: 'MenuTrigger',
           triggerRef: ref,
           scrollRef,
           placement: 'bottom start',
           style: {'--trigger-width': buttonWidth} as React.CSSProperties,
           'aria-labelledby': menuProps['aria-labelledby']
-        }]
+        } as const), [buttonWidth, menuProps])]
       ]}>
       <PressResponder {...menuTriggerProps} ref={ref} isPressed={state.isOpen}>
         {props.children}
@@ -130,17 +130,17 @@ export const SubmenuTrigger =  /*#__PURE__*/ createBranchComponent('submenutrigg
   return (
     <Provider
       values={[
-        [MenuItemContext, {...submenuTriggerProps, onAction: undefined, ref: itemRef}],
+        [MenuItemContext, useMemo(() => ({...submenuTriggerProps, onAction: undefined, ref: itemRef}), [itemRef, submenuTriggerProps])],
         [MenuContext, submenuProps],
         [OverlayTriggerStateContext, submenuTriggerState],
-        [PopoverContext, {
+        [PopoverContext, useMemo(() => ({
           ref: submenuRef,
           trigger: 'SubmenuTrigger',
           triggerRef: itemRef,
           placement: 'end top',
           'aria-labelledby': submenuProps['aria-labelledby'],
           ...popoverProps
-        }]
+        } as const), [itemRef, popoverProps, submenuProps])]
       ]}>
       <CollectionBranch collection={state.collection} parent={item} />
       {props.children[1]}
@@ -227,9 +227,9 @@ function MenuInner<T extends object>({props, collection, menuRef: ref}: MenuInne
         <Provider
           values={[
             [MenuStateContext, state],
-            [SeparatorContext, {elementType: 'div'}],
-            [SectionContext, {name: 'MenuSection', render: MenuSectionInner}],
-            [SubmenuTriggerContext, {parentMenuRef: ref, shouldUseVirtualFocus: autocompleteMenuProps?.shouldUseVirtualFocus}],
+            [SeparatorContext, useMemo(() => ({elementType: 'div'}), [])],
+            [SectionContext, useMemo(() => ({name: 'MenuSection', render: MenuSectionInner}), [])],
+            [SubmenuTriggerContext, useMemo(() => ({parentMenuRef: ref, shouldUseVirtualFocus: autocompleteMenuProps?.shouldUseVirtualFocus}), [autocompleteMenuProps?.shouldUseVirtualFocus, ref])],
             [MenuItemContext, null],
             [UNSTABLE_InternalAutocompleteContext, null],
             [SelectionManagerContext, state.selectionManager],
@@ -310,7 +310,7 @@ function MenuSectionInner<T extends object>(props: MenuSectionProps<T>, ref: For
       ref={ref}>
       <Provider
         values={[
-          [HeaderContext, {...headingProps, ref: headingRef}],
+          [HeaderContext, useMemo(() => ({...headingProps, ref: headingRef}), [headingProps, headingRef])],
           [SelectionManagerContext, manager]
         ]}>
         <CollectionBranch collection={state.collection} parent={section} />
@@ -412,13 +412,13 @@ export const MenuItem = /*#__PURE__*/ createLeafComponent('item', function MenuI
       data-open={props['aria-expanded'] === 'true' || undefined}>
       <Provider
         values={[
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             slots: {
               [DEFAULT_SLOT]: labelProps,
               label: labelProps,
               description: descriptionProps
             }
-          }],
+          }), [descriptionProps, labelProps])],
           [KeyboardContext, keyboardShortcutProps]
         ]}>
         {renderProps.children}

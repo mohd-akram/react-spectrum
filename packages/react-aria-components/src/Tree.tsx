@@ -396,8 +396,8 @@ function TreeInner<T extends object>({props, collection, treeRef: ref}: TreeInne
           <Provider
             values={[
               [TreeStateContext, state],
-              [DragAndDropContext, {dragAndDropHooks, dragState, dropState}],
-              [DropIndicatorContext, {render: TreeDropIndicatorWrapper}]
+              [DragAndDropContext, useMemo(() => ({dragAndDropHooks, dragState, dropState}), [dragAndDropHooks, dragState, dropState])],
+              [DropIndicatorContext, useMemo(() => ({render: TreeDropIndicatorWrapper}), [])]
             ]}>
             {hasDropHooks && <RootDropIndicator />}
             <CollectionRoot
@@ -665,14 +665,14 @@ export const TreeItem = /*#__PURE__*/ createBranchComponent('item', <T extends o
         <div {...gridCellProps} style={{display: 'contents'}}>
           <Provider
             values={[
-              [CheckboxContext, {
+              [CheckboxContext, useMemo(() => ({
                 slots: {
                   selection: checkboxProps
                 }
-              }],
+              }), [checkboxProps])],
               // TODO: support description in the tree row
               // TODO: don't think I need to pass isExpanded to the button here since it can be sourced from the renderProps? Might be worthwhile passing it down?
-              [ButtonContext, {
+              [ButtonContext, useMemo(() => ({
                 slots: {
                   [DEFAULT_SLOT]: {},
                   chevron: {
@@ -687,10 +687,10 @@ export const TreeItem = /*#__PURE__*/ createBranchComponent('item', <T extends o
                     }
                   }
                 }
-              }],
-              [TreeItemContentContext, {
+              } as const), [draggableItem?.dragButtonProps, expandButtonProps])],
+              [TreeItemContentContext, useMemo(() => ({
                 ...renderPropValues
-              }]
+              }), [renderPropValues])]
             ]}>
             {children}
           </Provider>

@@ -334,6 +334,17 @@ export const Picker = /*#__PURE__*/ (forwardRef as forwardRefType)(function Pick
   }
   let scale = useScale();
 
+  const headerContext = useMemo(() => ({styles: listboxHeader({size})}), [size]);
+  const headingContext = useMemo(() => ({
+    role: 'presentation',
+    styles: sectionHeading
+  }), []);
+  const textContext = useMemo(() => ({
+    slots: {
+      description: {styles: description({size})}
+    }
+  }), [size]);
+
   return (
     <AriaSelect
       {...pickerProps}
@@ -411,17 +422,9 @@ export const Picker = /*#__PURE__*/ (forwardRef as forwardRefType)(function Pick
                 })(props)}>
                 <Provider
                   values={[
-                    [HeaderContext, {styles: listboxHeader({size})}],
-                    [HeadingContext, {
-                      // @ts-ignore
-                      role: 'presentation',
-                      styles: sectionHeading
-                    }],
-                    [TextContext, {
-                      slots: {
-                        description: {styles: description({size})}
-                      }
-                    }]
+                    [HeaderContext, headerContext],
+                    [HeadingContext, headingContext],
+                    [TextContext, textContext]
                   ]}>
                   <ListBox
                     dependencies={props.dependencies}
@@ -489,6 +492,26 @@ const PickerButton = createHideableComponent(function PickerButton<T extends obj
     }, {once: true, capture: true});
   };
 
+  const iconContext = useMemo(() => ({
+    slots: {
+      icon: {
+        render: centerBaseline({slot: 'icon', styles: iconCenterWrapper}),
+        styles: icon
+      }
+    }
+  }), []);
+
+  const textContext = useMemo(() => ({
+    slots: {
+      description: {},
+      label: {styles: style({
+        display: 'block',
+        flexGrow: 1,
+        truncate: true
+      })}
+    }
+  }), []);
+
   return (
     <PressResponder onPressStart={onPressStart} isPressed={isPressed}>
       <Button
@@ -510,24 +533,8 @@ const PickerButton = createHideableComponent(function PickerButton<T extends obj
                 return (
                   <Provider
                     values={[
-                      [IconContext, {
-                        slots: {
-                          icon: {
-                            render: centerBaseline({slot: 'icon', styles: iconCenterWrapper}),
-                            styles: icon
-                          }
-                        }
-                      }],
-                      [TextContext, {
-                        slots: {
-                          description: {},
-                          label: {styles: style({
-                            display: 'block',
-                            flexGrow: 1,
-                            truncate: true
-                          })}
-                        }
-                      }],
+                      [IconContext, iconContext],
+                      [TextContext, textContext],
                       [InsideSelectValueContext, true]
                     ]}>
                     {defaultChildren}

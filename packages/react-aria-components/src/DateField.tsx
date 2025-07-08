@@ -21,7 +21,7 @@ import {Group, GroupContext} from './Group';
 import {HiddenDateInput} from './HiddenDateInput';
 import {Input, InputContext} from './Input';
 import {LabelContext} from './Label';
-import React, {cloneElement, createContext, ForwardedRef, forwardRef, JSX, ReactElement, useContext, useRef} from 'react';
+import React, {cloneElement, createContext, ForwardedRef, forwardRef, JSX, ReactElement, useContext, useMemo, useRef} from 'react';
 import {TextContext} from './Text';
 
 export interface DateFieldRenderProps {
@@ -93,15 +93,15 @@ export const DateField = /*#__PURE__*/ (forwardRef as forwardRefType)(function D
     <Provider
       values={[
         [DateFieldStateContext, state],
-        [GroupContext, {...fieldProps, ref: fieldRef, isInvalid: state.isInvalid, isDisabled: state.isDisabled}],
-        [InputContext, {...inputProps, ref: inputRef}],
-        [LabelContext, {...labelProps, ref: labelRef, elementType: 'span'}],
-        [TextContext, {
+        [GroupContext, useMemo(() => ({...fieldProps, ref: fieldRef, isInvalid: state.isInvalid, isDisabled: state.isDisabled}), [fieldProps, state.isDisabled, state.isInvalid])],
+        [InputContext, useMemo(() => ({...inputProps, ref: inputRef}), [inputProps])],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef, elementType: 'span'}), [labelProps, labelRef])],
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
+        }), [descriptionProps, errorMessageProps])],
         [FieldErrorContext, validation]
       ]}>
       <div
@@ -164,15 +164,15 @@ export const TimeField = /*#__PURE__*/ (forwardRef as forwardRefType)(function T
     <Provider
       values={[
         [TimeFieldStateContext, state],
-        [GroupContext, {...fieldProps, ref: fieldRef, isInvalid: state.isInvalid, isDisabled: state.isDisabled}],
-        [InputContext, {...inputProps, ref: inputRef}],
-        [LabelContext, {...labelProps, ref: labelRef, elementType: 'span'}],
-        [TextContext, {
+        [GroupContext, useMemo(() => ({...fieldProps, ref: fieldRef, isInvalid: state.isInvalid, isDisabled: state.isDisabled}), [fieldProps, state.isDisabled, state.isInvalid])],
+        [InputContext, useMemo(() => ({...inputProps, ref: inputRef}), [inputProps])],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef, elementType: 'span'}), [labelProps, labelRef])],
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
+        }), [descriptionProps, errorMessageProps])],
         [FieldErrorContext, validation]
       ]}>
       <div
@@ -180,7 +180,7 @@ export const TimeField = /*#__PURE__*/ (forwardRef as forwardRefType)(function T
         {...renderProps}
         ref={ref}
         slot={props.slot || undefined}
-        data-invalid={state.isInvalid || undefined} 
+        data-invalid={state.isInvalid || undefined}
         data-disabled={state.isDisabled || undefined} />
     </Provider>
   );
@@ -248,8 +248,8 @@ const DateInputStandalone = forwardRef((props: DateInputProps, ref: ForwardedRef
     <Provider
       values={[
         [DateFieldStateContext, state],
-        [InputContext, {...inputProps, ref: inputRef}],
-        [GroupContext, {...fieldProps, ref: fieldRef, isInvalid: state.isInvalid, isDisabled: state.isDisabled}]
+        [InputContext, useMemo(() => ({...inputProps, ref: inputRef}), [inputProps])],
+        [GroupContext, useMemo(() => ({...fieldProps, ref: fieldRef, isInvalid: state.isInvalid, isDisabled: state.isDisabled}), [fieldProps, fieldRef, state.isDisabled, state.isInvalid])]
       ]}>
       <DateInputInner {...props} />
     </Provider>

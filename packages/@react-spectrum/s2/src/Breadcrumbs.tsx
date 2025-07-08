@@ -116,7 +116,7 @@ export const Breadcrumbs = /*#__PURE__*/ (forwardRef as forwardRefType)(function
   return (
     <Provider
       values={[
-        [InternalBreadcrumbsContext, {size, isDisabled}]
+        [InternalBreadcrumbsContext, useMemo(() => ({size, isDisabled}), [isDisabled, size])]
       ]}>
       <CollapsingCollection containerRef={domRef} onAction={props.onAction}>
         <RACBreadcrumbs
@@ -302,6 +302,7 @@ export const Breadcrumb = /*#__PURE__*/ (forwardRef as forwardRefType)(function 
   let {size = 'M'} = useContext(InternalBreadcrumbsContext) ?? {};
   let domRef = useDOMRef(ref);
   let {direction} = useLocale();
+  const headingContext = useMemo(() => ({className: heading}), []);
   return (
     <AriaBreadcrumb
       {...props}
@@ -324,7 +325,7 @@ export const Breadcrumb = /*#__PURE__*/ (forwardRef as forwardRefType)(function 
               className={currentStyles({size})}>
               <Provider
                 values={[
-                  [HeadingContext, {className: heading}]
+                  [HeadingContext, headingContext]
                 ]}>
                 {children}
               </Provider>

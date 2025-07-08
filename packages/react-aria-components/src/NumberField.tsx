@@ -21,7 +21,7 @@ import {GroupContext} from './Group';
 import {InputContext} from './Input';
 import {LabelContext} from './Label';
 import {NumberFieldState, useNumberFieldState} from 'react-stately';
-import React, {createContext, ForwardedRef, forwardRef, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, useMemo, useRef} from 'react';
 import {TextContext} from './Text';
 
 export interface NumberFieldRenderProps {
@@ -103,20 +103,20 @@ export const NumberField = /*#__PURE__*/ (forwardRef as forwardRefType)(function
       values={[
         [NumberFieldStateContext, state],
         [GroupContext, groupProps],
-        [InputContext, {...inputProps, ref: inputRef}],
-        [LabelContext, {...labelProps, ref: labelRef}],
-        [ButtonContext, {
+        [InputContext, useMemo(() => ({...inputProps, ref: inputRef}), [inputProps])],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef}), [labelProps, labelRef])],
+        [ButtonContext, useMemo(() => ({
           slots: {
             increment: incrementButtonProps,
             decrement: decrementButtonProps
           }
-        }],
-        [TextContext, {
+        }), [decrementButtonProps, incrementButtonProps])],
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
+        }), [descriptionProps, errorMessageProps])],
         [FieldErrorContext, validation]
       ]}>
       <div

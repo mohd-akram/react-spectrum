@@ -181,10 +181,10 @@ function SelectInner<T extends object>({props, selectRef: ref, collection}: Sele
         [SelectContext, props],
         [SelectStateContext, state],
         [SelectValueContext, valueProps],
-        [LabelContext, {...labelProps, ref: labelRef, elementType: 'span'}],
-        [ButtonContext, {...triggerProps, ref: buttonRef, isPressed: state.isOpen, autoFocus: props.autoFocus}],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef, elementType: 'span'}), [labelProps, labelRef])],
+        [ButtonContext, useMemo(() => ({...triggerProps, ref: buttonRef, isPressed: state.isOpen, autoFocus: props.autoFocus}), [props.autoFocus, state.isOpen, triggerProps])],
         [OverlayTriggerStateContext, state],
-        [PopoverContext, {
+        [PopoverContext, useMemo(() => ({
           trigger: 'Select',
           triggerRef: buttonRef,
           scrollRef,
@@ -192,15 +192,15 @@ function SelectInner<T extends object>({props, selectRef: ref, collection}: Sele
           style: {'--trigger-width': buttonWidth} as React.CSSProperties,
           'aria-labelledby': menuProps['aria-labelledby'],
           clearContexts: CLEAR_CONTEXTS
-        }],
-        [ListBoxContext, {...menuProps, ref: scrollRef}],
+        } as const), [buttonWidth, menuProps])],
+        [ListBoxContext, useMemo(() => ({...menuProps, ref: scrollRef}), [menuProps])],
         [ListStateContext, state],
-        [TextContext, {
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
+        }), [descriptionProps, errorMessageProps])],
         [FieldErrorContext, validation]
       ]}>
       <div

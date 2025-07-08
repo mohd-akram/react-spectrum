@@ -6,7 +6,7 @@ import {GlobalDOMAttributes} from '@react-types/shared';
 import {InternalColorThumbContext} from './ColorThumb';
 import {LabelContext} from './Label';
 import {Provider, RenderProps, SlotProps, useContextProps, useRenderProps, useSlot} from './utils';
-import React, {createContext, ForwardedRef, forwardRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, useMemo} from 'react';
 import {SliderOutputContext, SliderStateContext, SliderTrackContext} from './Slider';
 
 export interface ColorSliderRenderProps {
@@ -74,14 +74,14 @@ export const ColorSlider = forwardRef(function ColorSlider(props: ColorSliderPro
       values={[
         [ColorSliderStateContext, state],
         [SliderStateContext, state],
-        [SliderTrackContext, {...trackProps, ref: trackRef}],
+        [SliderTrackContext, useMemo(() => ({...trackProps, ref: trackRef}), [trackProps])],
         [SliderOutputContext, outputProps],
-        [LabelContext, {
+        [LabelContext, useMemo(() => ({
           ...labelProps,
           ref: labelRef,
           children: state.value.getChannelName(props.channel, locale)
-        }],
-        [InternalColorThumbContext, {state, thumbProps, inputXRef: inputRef, xInputProps: inputProps, isDisabled: props.isDisabled}]
+        }), [labelProps, labelRef, locale, props.channel, state.value])],
+        [InternalColorThumbContext, useMemo(() => ({state, thumbProps, inputXRef: inputRef, xInputProps: inputProps, isDisabled: props.isDisabled}), [inputProps, props.isDisabled, state, thumbProps])]
       ]}>
       <div
         {...DOMProps}

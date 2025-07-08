@@ -14,7 +14,7 @@ import {baseColor, focusRing, fontRelative, lightDark, linearGradient, style} fr
 import {ButtonRenderProps, ContextValue, Link, LinkProps, OverlayTriggerStateContext, Provider, Button as RACButton, ButtonProps as RACButtonProps} from 'react-aria-components';
 import {centerBaseline} from './CenterBaseline';
 import {control, getAllowedOverrides, staticColor, StyleProps} from './style-utils' with {type: 'macro'};
-import {createContext, forwardRef, ReactNode, useContext, useEffect, useState} from 'react';
+import {createContext, forwardRef, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
 import {FocusableRef, FocusableRefValue, GlobalDOMAttributes} from '@react-types/shared';
 import {IconContext} from './Icon';
 // @ts-ignore
@@ -330,6 +330,32 @@ export const Button = forwardRef(function Button(props: ButtonProps, ref: Focusa
     };
   }, [isPending]);
 
+  const textContext = useMemo(() => ({
+    styles: style({
+      paddingY: '--labelPadding',
+      order: 1,
+      opacity: {
+        default: 1,
+        isProgressVisible: 0
+      }
+    })({isProgressVisible}),
+    // @ts-ignore data-attributes allowed on all JSX elements, but adding to DOMProps has been problematic in the past
+    'data-rsp-slot': 'text'
+  }), [isProgressVisible]);
+
+  const iconContext = useMemo(() => ({
+    render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
+    styles: style({
+      size: fontRelative(20),
+      marginStart: '--iconMargin',
+      flexShrink: 0,
+      opacity: {
+        default: 1,
+        isProgressVisible: 0
+      }
+    })({isProgressVisible})
+  }), [isProgressVisible]);
+
   return (
     <RACButton
       {...props}
@@ -362,30 +388,8 @@ export const Button = forwardRef(function Button(props: ButtonProps, ref: Focusa
         <Provider
           values={[
             [SkeletonContext, null],
-            [TextContext, {
-              styles: style({
-                paddingY: '--labelPadding',
-                order: 1,
-                opacity: {
-                  default: 1,
-                  isProgressVisible: 0
-                }
-              })({isProgressVisible}),
-              // @ts-ignore data-attributes allowed on all JSX elements, but adding to DOMProps has been problematic in the past
-              'data-rsp-slot': 'text'
-            }],
-            [IconContext, {
-              render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
-              styles: style({
-                size: fontRelative(20),
-                marginStart: '--iconMargin',
-                flexShrink: 0,
-                opacity: {
-                  default: 1,
-                  isProgressVisible: 0
-                }
-              })({isProgressVisible})
-            }]
+            [TextContext, textContext],
+            [IconContext, iconContext]
           ]}>
           {typeof props.children === 'string' ? <Text>{props.children}</Text> : props.children}
           {isPending &&
@@ -451,15 +455,15 @@ export const LinkButton = forwardRef(function LinkButton(props: LinkButtonProps,
       <Provider
         values={[
           [SkeletonContext, null],
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             styles: style({paddingY: '--labelPadding', order: 1}),
             // @ts-ignore data-attributes allowed on all JSX elements, but adding to DOMProps has been problematic in the past
             'data-rsp-slot': 'text'
-          }],
-          [IconContext, {
+          }), [])],
+          [IconContext, useMemo(() => ({
             render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
             styles: style({size: fontRelative(20), marginStart: '--iconMargin', flexShrink: 0})
-          }]
+          }), [])]
         ]}>
         {typeof props.children === 'string' ? <Text>{props.children}</Text> : props.children}
       </Provider>

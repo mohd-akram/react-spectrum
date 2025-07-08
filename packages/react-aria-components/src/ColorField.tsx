@@ -20,7 +20,7 @@ import {GroupContext} from './Group';
 import {InputContext} from './Input';
 import {LabelContext} from './Label';
 import {Provider, RACValidation, removeDataAttributes, RenderProps, SlotProps, useContextProps, useRenderProps, useSlot} from './utils';
-import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, InputHTMLAttributes, LabelHTMLAttributes, Ref, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, InputHTMLAttributes, LabelHTMLAttributes, Ref, useMemo, useRef} from 'react';
 import {TextContext} from './Text';
 
 export interface ColorFieldRenderProps {
@@ -47,7 +47,7 @@ export interface ColorFieldRenderProps {
 
 export interface ColorFieldProps extends Omit<AriaColorFieldProps, 'label' | 'placeholder' | 'description' | 'errorMessage' | 'validationState' | 'validationBehavior'>, RACValidation, InputDOMProps, RenderProps<ColorFieldRenderProps>, SlotProps, GlobalDOMAttributes<HTMLDivElement> {
   /**
-   * The color channel that this field edits. If not provided, 
+   * The color channel that this field edits. If not provided,
    * the color is edited as a hex value.
    */
   channel?: ColorChannel,
@@ -189,15 +189,15 @@ function useChildren(
     <Provider
       values={[
         [ColorFieldStateContext, state],
-        [InputContext, {...inputProps, ref: inputRef}],
-        [LabelContext, {...labelProps, ref: labelRef}],
-        [GroupContext, {role: 'presentation', isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false}],
-        [TextContext, {
+        [InputContext, useMemo(() => ({...inputProps, ref: inputRef}), [inputProps, inputRef])],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef}), [labelProps, labelRef])],
+        [GroupContext, useMemo(() => ({role: 'presentation', isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false} as const), [props.isDisabled, validation.isInvalid])],
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
+        }), [descriptionProps, errorMessageProps])],
         [FieldErrorContext, validation]
       ]}>
       <div

@@ -30,7 +30,7 @@ import {ContextValue, DOMProps, Provider, RenderProps, SlotProps, StyleProps, us
 import {DOMAttributes, FocusableElement, forwardRefType, GlobalDOMAttributes, HoverEvents} from '@react-types/shared';
 import {filterDOMProps} from '@react-aria/utils';
 import {HeadingContext} from './RSPContexts';
-import React, {createContext, ForwardedRef, forwardRef, ReactElement, useContext, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, ReactElement, useContext, useMemo, useRef} from 'react';
 import {TextContext} from './Text';
 
 export interface CalendarRenderProps {
@@ -127,20 +127,20 @@ export const Calendar = /*#__PURE__*/ (forwardRef as forwardRefType)(function Ca
       data-invalid={state.isValueInvalid || undefined}>
       <Provider
         values={[
-          [ButtonContext, {
+          [ButtonContext, useMemo(() => ({
             slots: {
               previous: prevButtonProps,
               next: nextButtonProps
             }
-          }],
-          [HeadingContext, {'aria-hidden': true, level: 2, children: title}],
+          }), [nextButtonProps, prevButtonProps])],
+          [HeadingContext, useMemo(() => ({'aria-hidden': true, level: 2, children: title}), [title])],
           [CalendarStateContext, state],
           [CalendarContext, props as CalendarProps<any>],
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             slots: {
               errorMessage: errorMessageProps
             }
-          }]
+          }), [errorMessageProps])]
         ]}>
         {/* Add a screen reader only description of the entire visible range rather than
           * a separate heading above each month grid. This is placed first in the DOM order
@@ -205,20 +205,20 @@ export const RangeCalendar = /*#__PURE__*/ (forwardRef as forwardRefType)(functi
       data-invalid={state.isValueInvalid || undefined}>
       <Provider
         values={[
-          [ButtonContext, {
+          [ButtonContext, useMemo(() => ({
             slots: {
               previous: prevButtonProps,
               next: nextButtonProps
             }
-          }],
-          [HeadingContext, {'aria-hidden': true, level: 2, children: title}],
+          }), [nextButtonProps, prevButtonProps])],
+          [HeadingContext, useMemo(() => ({'aria-hidden': true, level: 2, children: title}), [title])],
           [RangeCalendarStateContext, state],
           [RangeCalendarContext, props as RangeCalendarProps<any>],
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             slots: {
               errorMessage: errorMessageProps
             }
-          }]
+          }), [errorMessageProps])]
         ]}>
         {/* Add a screen reader only description of the entire visible range rather than
           * a separate heading above each month grid. This is placed first in the DOM order

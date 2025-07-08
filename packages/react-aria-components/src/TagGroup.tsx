@@ -20,7 +20,7 @@ import {forwardRefType, GlobalDOMAttributes, HoverEvents, Key, LinkDOMProps, Pre
 import {LabelContext} from './Label';
 import {ListState, Node, useListState} from 'react-stately';
 import {ListStateContext} from './ListBox';
-import React, {createContext, ForwardedRef, forwardRef, JSX, ReactNode, useContext, useEffect, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, JSX, ReactNode, useContext, useEffect, useMemo, useRef} from 'react';
 import {TextContext} from './Text';
 
 export interface TagGroupProps extends Omit<AriaTagGroupProps<unknown>, 'children' | 'items' | 'label' | 'description' | 'errorMessage' | 'keyboardDelegate'>, DOMProps, SlotProps, GlobalDOMAttributes<HTMLDivElement> {}
@@ -107,15 +107,15 @@ function TagGroupInner({props, forwardedRef: ref, collection}: TagGroupInnerProp
       style={props.style}>
       <Provider
         values={[
-          [LabelContext, {...labelProps, elementType: 'span', ref: labelRef}],
-          [TagListContext, {...gridProps, ref: tagListRef}],
+          [LabelContext, useMemo(() => ({...labelProps, elementType: 'span', ref: labelRef}), [labelProps, labelRef])],
+          [TagListContext, useMemo(() => ({...gridProps, ref: tagListRef}), [gridProps])],
           [ListStateContext, state],
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             slots: {
               description: descriptionProps,
               errorMessage: errorMessageProps
             }
-          }]
+          }), [descriptionProps, errorMessageProps])]
         ]}>
         {props.children}
       </Provider>
@@ -249,11 +249,11 @@ export const Tag = /*#__PURE__*/ createLeafComponent('item', (props: TagProps, f
       <div {...gridCellProps} style={{display: 'contents'}}>
         <Provider
           values={[
-            [ButtonContext, {
+            [ButtonContext, useMemo(() => ({
               slots: {
                 remove: removeButtonProps
               }
-            }],
+            }), [removeButtonProps])],
             [CollectionRendererContext, DefaultCollectionRenderer]
           ]}>
           {renderProps.children}

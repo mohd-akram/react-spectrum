@@ -24,7 +24,7 @@ import {GroupContext} from './Group';
 import {HiddenDateInput} from './HiddenDateInput';
 import {LabelContext} from './Label';
 import {PopoverContext} from './Popover';
-import React, {createContext, ForwardedRef, forwardRef, useCallback, useRef, useState} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, useCallback, useMemo, useRef, useState} from 'react';
 import {TextContext} from './Text';
 
 export interface DatePickerRenderProps {
@@ -142,26 +142,26 @@ export const DatePicker = /*#__PURE__*/ (forwardRef as forwardRefType)(function 
     <Provider
       values={[
         [DatePickerStateContext, state],
-        [GroupContext, {...groupProps, ref: groupRef, isInvalid: state.isInvalid}],
+        [GroupContext, useMemo(() => ({...groupProps, ref: groupRef, isInvalid: state.isInvalid}), [groupProps, state.isInvalid])],
         [DateFieldContext, fieldProps],
-        [ButtonContext, {...buttonProps, isPressed: state.isOpen}],
-        [LabelContext, {...labelProps, ref: labelRef, elementType: 'span'}],
+        [ButtonContext, useMemo(() => ({...buttonProps, isPressed: state.isOpen}), [buttonProps, state.isOpen])],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef, elementType: 'span'}), [labelProps, labelRef])],
         [CalendarContext, calendarProps],
         [OverlayTriggerStateContext, state],
-        [PopoverContext, {
+        [PopoverContext, useMemo(() => ({
           trigger: 'DatePicker',
           triggerRef: groupRef,
           placement: 'bottom start',
           style: {'--trigger-width': groupWidth} as React.CSSProperties,
           clearContexts: CLEAR_CONTEXTS
-        }],
+        } as const), [groupWidth])],
         [DialogContext, dialogProps],
-        [TextContext, {
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
+        }), [descriptionProps, errorMessageProps])],
         [FieldErrorContext, validation]
       ]}>
       <div
@@ -250,31 +250,31 @@ export const DateRangePicker = /*#__PURE__*/ (forwardRef as forwardRefType)(func
     <Provider
       values={[
         [DateRangePickerStateContext, state],
-        [GroupContext, {...groupProps, ref: groupRef, isInvalid: state.isInvalid}],
-        [ButtonContext, {...buttonProps, isPressed: state.isOpen}],
-        [LabelContext, {...labelProps, ref: labelRef, elementType: 'span'}],
+        [GroupContext, useMemo(() => ({...groupProps, ref: groupRef, isInvalid: state.isInvalid}), [groupProps, state.isInvalid])],
+        [ButtonContext, useMemo(() => ({...buttonProps, isPressed: state.isOpen}), [buttonProps, state.isOpen])],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef, elementType: 'span'}), [labelProps, labelRef])],
         [RangeCalendarContext, calendarProps],
         [OverlayTriggerStateContext, state],
-        [PopoverContext, {
+        [PopoverContext, useMemo(() => ({
           trigger: 'DateRangePicker',
           triggerRef: groupRef,
           placement: 'bottom start',
           style: {'--trigger-width': groupWidth} as React.CSSProperties,
           clearContexts: CLEAR_CONTEXTS
-        }],
+        } as const), [groupWidth])],
         [DialogContext, dialogProps],
-        [DateFieldContext, {
+        [DateFieldContext, useMemo(() => ({
           slots: {
             start: startFieldProps,
             end: endFieldProps
           }
-        }],
-        [TextContext, {
+        }), [endFieldProps, startFieldProps])],
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
+        }), [descriptionProps, errorMessageProps])],
         [FieldErrorContext, validation]
       ]}>
       <div

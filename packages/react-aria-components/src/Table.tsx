@@ -477,8 +477,8 @@ function TableInner({props, forwardedRef: ref, selectionState, collection}: Tabl
       values={[
         [TableStateContext, state],
         [TableColumnResizeStateContext, layoutState],
-        [DragAndDropContext, {dragAndDropHooks, dragState, dropState}],
-        [DropIndicatorContext, {render: TableDropIndicatorWrapper}]
+        [DragAndDropContext, useMemo(() => ({dragAndDropHooks, dragState, dropState}), [dragAndDropHooks, dragState, dropState])],
+        [DropIndicatorContext, useMemo(() => ({render: TableDropIndicatorWrapper}), [])]
       ]}>
       <FocusScope>
         <ElementType
@@ -609,11 +609,11 @@ function TableHeaderRow({item}: {item: GridNode<any>}) {
     <TR {...rowProps} ref={ref}>
       <Provider
         values={[
-          [CheckboxContext, {
+          [CheckboxContext, useMemo(() => ({
             slots: {
               selection: checkboxProps
             }
-          }]
+          }), [checkboxProps])]
         ]}>
         <CollectionBranch collection={state.collection} parent={item} />
       </Provider>
@@ -759,7 +759,7 @@ export const Column = /*#__PURE__*/ createLeafComponent('column', (props: Column
       data-sort-direction={state.sortDescriptor?.column === column.key ? state.sortDescriptor.direction : undefined}>
       <Provider
         values={[
-          [ColumnResizerContext, {column, triggerRef: ref}],
+          [ColumnResizerContext, useMemo(() => ({column, triggerRef: ref}), [column, ref])],
           [CollectionRendererContext, DefaultCollectionRenderer]
         ]}>
         {renderProps.children}
@@ -1126,13 +1126,13 @@ export const Row = /*#__PURE__*/ createBranchComponent(
           data-focus-visible-within={isFocusVisibleWithin || undefined}>
           <Provider
             values={[
-              [CheckboxContext, {
+              [CheckboxContext, useMemo(() => ({
                 slots: {
                   [DEFAULT_SLOT]: {},
                   selection: checkboxProps
                 }
-              }],
-              [ButtonContext, {
+              }), [checkboxProps])],
+              [ButtonContext, useMemo(() => ({
                 slots: {
                   [DEFAULT_SLOT]: {},
                   drag: {
@@ -1143,7 +1143,7 @@ export const Row = /*#__PURE__*/ createBranchComponent(
                     }
                   }
                 }
-              }]
+              } as const), [draggableItem?.dragButtonProps])]
             ]}>
             <CollectionBranch collection={state.collection} parent={item} />
           </Provider>

@@ -17,7 +17,7 @@ import {filterDOMProps, useEnterAnimation, useExitAnimation, useLayoutEffect} fr
 import {FocusableProvider} from '@react-aria/focus';
 import {OverlayArrowContext} from './OverlayArrow';
 import {OverlayTriggerProps, TooltipTriggerProps, TooltipTriggerState, useTooltipTriggerState} from 'react-stately';
-import React, {createContext, ForwardedRef, forwardRef, JSX, ReactNode, useContext, useRef, useState} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, JSX, ReactNode, useContext, useMemo, useRef, useState} from 'react';
 
 export interface TooltipTriggerComponentProps extends TooltipTriggerProps {
   children: ReactNode
@@ -90,7 +90,7 @@ export function TooltipTrigger(props: TooltipTriggerComponentProps): JSX.Element
     <Provider
       values={[
         [TooltipTriggerStateContext, state],
-        [TooltipContext, {...tooltipProps, triggerRef: ref}]
+        [TooltipContext, useMemo(() => ({...tooltipProps, triggerRef: ref}), [tooltipProps])]
       ]}>
       <FocusableProvider {...triggerProps} ref={ref}>
         {props.children}

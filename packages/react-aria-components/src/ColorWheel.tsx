@@ -5,7 +5,7 @@ import {ContextValue, Provider, RenderProps, SlotProps, StyleRenderProps, useCon
 import {filterDOMProps} from '@react-aria/utils';
 import {GlobalDOMAttributes} from '@react-types/shared';
 import {InternalColorThumbContext} from './ColorThumb';
-import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, useContext, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, useContext, useMemo, useRef} from 'react';
 
 export interface ColorWheelRenderProps {
   /**
@@ -58,7 +58,7 @@ export const ColorWheel = forwardRef(function ColorWheel(props: ColorWheelProps,
         values={[
           [ColorWheelStateContext, state],
           [ColorWheelTrackContext, trackProps],
-          [InternalColorThumbContext, {state, thumbProps, inputXRef: inputRef, xInputProps: inputProps, isDisabled: props.isDisabled}]
+          [InternalColorThumbContext, useMemo(() => ({state, thumbProps, inputXRef: inputRef, xInputProps: inputProps, isDisabled: props.isDisabled}), [inputProps, props.isDisabled, state, thumbProps])]
         ]}>
         {renderProps.children}
       </Provider>

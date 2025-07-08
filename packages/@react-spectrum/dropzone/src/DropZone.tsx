@@ -16,7 +16,7 @@ import {DropZoneProps, HeadingContext, Provider, DropZone as RACDropZone} from '
 // @ts-ignore
 import intlMessages from '../intl/*.json';
 import {mergeProps, useId} from '@react-aria/utils';
-import React, {ReactNode} from 'react';
+import React, {ReactNode, useMemo} from 'react';
 import styles from '@adobe/spectrum-css-temp/components/dropzone/vars.css';
 import {useLocalizedStringFormatter} from '@react-aria/i18n';
 
@@ -51,7 +51,7 @@ export const DropZone = React.forwardRef(function DropZone(props: SpectrumDropZo
   return (
     <Provider
       values={[
-        [HeadingContext, {id: headingId}]
+        [HeadingContext, useMemo(() => ({id: headingId}), [headingId])]
       ]}>
       <RACDropZone
         {...mergeProps(filterProps(otherProps))}

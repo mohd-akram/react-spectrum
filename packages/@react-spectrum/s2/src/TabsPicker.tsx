@@ -48,7 +48,7 @@ import {Placement} from 'react-aria';
 import {PopoverBase} from './Popover';
 import {pressScale} from './pressScale';
 import {raw} from '../style/style-macro' with {type: 'macro'};
-import React, {createContext, forwardRef, ReactNode, useContext, useRef} from 'react';
+import React, {createContext, forwardRef, ReactNode, useContext, useMemo, useRef} from 'react';
 import {useFocusableRef} from '@react-spectrum/utils';
 import {useFormProps} from './Form';
 import {useSpectrumContextProps} from './useSpectrumContextProps';
@@ -178,6 +178,42 @@ function Picker<T extends object>(props: PickerProps<T>, ref: FocusableRef<HTMLB
   const menuOffset: number = 6;
   const size = 'M';
   let ariaLabelledby = props['aria-labelledby'] ?? '';
+  const iconContext = useMemo(() => ({
+    slots: {
+      icon: {
+        render: centerBaseline({slot: 'icon', styles: iconCenterWrapper({labelBehavior})}),
+        styles: icon
+      }
+    }
+  }), [labelBehavior]);
+  const textContext = useMemo(() => ({
+    slots: {
+      // Default slot is useful when converting other collections to PickerItems.
+      [DEFAULT_SLOT]: {
+        id: valueId,
+        styles: style({
+          display: {
+            default: 'block',
+            labelBehavior: {
+              hide: 'none'
+            }
+          },
+          flexGrow: 1,
+          truncate: true
+        })({labelBehavior})
+      }
+    }
+  }), [labelBehavior, valueId]);
+  const headerContext = useMemo(() => ({styles: sectionHeader({size})}), []);
+  const headingContext = useMemo(() => ({
+    role: 'presentation',
+    styles: sectionHeading
+  }), []);
+  const popoverTextContent = useMemo(() => ({
+    slots: {
+      description: {styles: description({size})}
+    }
+  }), []);
   return (
     <div>
       <AriaSelect
@@ -204,32 +240,8 @@ function Picker<T extends object>(props: PickerProps<T>, ref: FocusableRef<HTMLB
                   return (
                     <Provider
                       values={[
-                        [IconContext, {
-                          slots: {
-                            icon: {
-                              render: centerBaseline({slot: 'icon', styles: iconCenterWrapper({labelBehavior})}),
-                              styles: icon
-                            }
-                          }
-                        }],
-                        [TextContext, {
-                          slots: {
-                            // Default slot is useful when converting other collections to PickerItems.
-                            [DEFAULT_SLOT]: {
-                              id: valueId,
-                              styles: style({
-                                display: {
-                                  default: 'block',
-                                  labelBehavior: {
-                                    hide: 'none'
-                                  }
-                                },
-                                flexGrow: 1,
-                                truncate: true
-                              })({labelBehavior})
-                            }
-                          }
-                        }],
+                        [IconContext, iconContext],
+                        [TextContext, textContext],
                         [InsideSelectValueContext, true]
                       ]}>
                       {defaultChildren}
@@ -253,17 +265,9 @@ function Picker<T extends object>(props: PickerProps<T>, ref: FocusableRef<HTMLB
               })}>
               <Provider
                 values={[
-                  [HeaderContext, {styles: sectionHeader({size})}],
-                  [HeadingContext, {
-                    // @ts-ignore
-                    role: 'presentation',
-                    styles: sectionHeading
-                  }],
-                  [TextContext, {
-                    slots: {
-                      description: {styles: description({size})}
-                    }
-                  }]
+                  [HeaderContext, headerContext],
+                  [HeadingContext, headingContext],
+                  [TextContext, popoverTextContent]
                 ]}>
                 <ListBox
                   items={items}

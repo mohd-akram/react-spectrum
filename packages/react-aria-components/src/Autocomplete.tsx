@@ -15,7 +15,7 @@ import {AutocompleteState, useAutocompleteState} from '@react-stately/autocomple
 import {InputContext} from './Input';
 import {mergeProps} from '@react-aria/utils';
 import {Provider, removeDataAttributes, SlotProps, SlottedContextValue, useSlottedContext} from './utils';
-import React, {createContext, JSX, RefObject, useRef} from 'react';
+import React, {createContext, JSX, RefObject, useMemo, useRef} from 'react';
 import {SearchFieldContext} from './SearchField';
 import {TextFieldContext} from './TextField';
 
@@ -62,7 +62,7 @@ export function Autocomplete(props: AutocompleteProps): JSX.Element {
         [AutocompleteStateContext, state],
         [SearchFieldContext, textFieldProps],
         [TextFieldContext, textFieldProps],
-        [InputContext, {ref: inputRef}],
+        [InputContext, useMemo(() => ({ref: inputRef}), [])],
         [UNSTABLE_InternalAutocompleteContext, {
           filter: filterFn,
           collectionProps,

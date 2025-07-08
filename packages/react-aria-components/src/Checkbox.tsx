@@ -158,13 +158,13 @@ export const CheckboxGroup = /*#__PURE__*/ (forwardRef as forwardRefType)(functi
       <Provider
         values={[
           [CheckboxGroupStateContext, state],
-          [LabelContext, {...labelProps, ref: labelRef, elementType: 'span'}],
-          [TextContext, {
+          [LabelContext, useMemo(() => ({...labelProps, ref: labelRef, elementType: 'span'}), [labelProps, labelRef])],
+          [TextContext, useMemo(() => ({
             slots: {
               description: descriptionProps,
               errorMessage: errorMessageProps
             }
-          }],
+          }), [descriptionProps, errorMessageProps])],
           [FieldErrorContext, validation]
         ]}>
         {renderProps.children}

@@ -34,7 +34,7 @@ import {centerBaseline} from './CenterBaseline';
 import {centerPadding, control, controlFont, controlSize, getAllowedOverrides, StyleProps} from './style-utils' with {type: 'macro'};
 import CheckmarkIcon from '../ui-icons/Checkmark';
 import ChevronRightIcon from '../ui-icons/Chevron';
-import {createContext, forwardRef, JSX, ReactNode, useContext, useRef, useState} from 'react';
+import {createContext, forwardRef, JSX, ReactNode, useContext, useMemo, useRef, useState} from 'react';
 import {divider} from './Divider';
 import {DOMRef, DOMRefValue, GlobalDOMAttributes, PressEvent} from '@react-types/shared';
 import {forwardRefType} from './types';
@@ -360,17 +360,17 @@ export const Menu = /*#__PURE__*/ (forwardRef as forwardRefType)(function Menu<T
     <InternalMenuContext.Provider value={{size, isSubmenu: true, hideLinkOutIcon}}>
       <Provider
         values={[
-          [HeaderContext, {styles: sectionHeader({size})}],
-          [HeadingContext, {
+          [HeaderContext, useMemo(() => ({styles: sectionHeader({size})}), [size])],
+          [HeadingContext, useMemo(() => ({
             // @ts-ignore
             role: 'presentation',
             styles: sectionHeading
-          }],
-          [TextContext, {
+          }), [])],
+          [TextContext, useMemo(() => ({
             slots: {
               'description': {styles: description({size})}
             }
-          }]
+          }), [size])]
         ]}>
         <AriaMenu
           {...props}
@@ -470,6 +470,13 @@ export function MenuItem(props: MenuItemProps): ReactNode {
   let {size, hideLinkOutIcon} = useContext(InternalMenuContext);
   let textValue = props.textValue || (typeof props.children === 'string' ? props.children : undefined);
   let {direction} = useLocale();
+  const iconContext = useMemo(() => ({
+    slots: {
+      icon: {render: centerBaseline({slot: 'icon', styles: iconCenterWrapper}), styles: icon},
+      descriptor: {render: centerBaseline({slot: 'descriptor', styles: descriptor})} // TODO: remove once we have default?
+    }
+  }), []);
+  const imageContext = useMemo(() => ({styles: image({size})}), [size]);
   return (
     <AriaMenuItem
       {...props}
@@ -484,12 +491,7 @@ export function MenuItem(props: MenuItemProps): ReactNode {
           <>
             <Provider
               values={[
-                [IconContext, {
-                  slots: {
-                    icon: {render: centerBaseline({slot: 'icon', styles: iconCenterWrapper}), styles: icon},
-                    descriptor: {render: centerBaseline({slot: 'descriptor', styles: descriptor})} // TODO: remove once we have default?
-                  }
-                }],
+                [IconContext, iconContext],
                 [TextContext, {
                   slots: {
                     [DEFAULT_SLOT]: {styles: label({size})},
@@ -499,7 +501,7 @@ export function MenuItem(props: MenuItemProps): ReactNode {
                   }
                 }],
                 [KeyboardContext, {styles: keyboard({size, isDisabled: renderProps.isDisabled})}],
-                [ImageContext, {styles: image({size})}]
+                [ImageContext, imageContext]
               ]}>
               {renderProps.selectionMode === 'single' && !renderProps.hasSubmenu && <CheckmarkIcon size={checkmarkIconSize[size]} className={checkmark({...renderProps, size})} />}
               {renderProps.selectionMode === 'multiple' && !renderProps.hasSubmenu && (

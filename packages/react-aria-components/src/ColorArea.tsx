@@ -5,7 +5,7 @@ import {filterDOMProps, mergeProps} from '@react-aria/utils';
 import {GlobalDOMAttributes} from '@react-types/shared';
 import {InternalColorThumbContext} from './ColorThumb';
 import {Provider, RenderProps, SlotProps, useContextProps, useRenderProps} from './utils';
-import React, {createContext, ForwardedRef, forwardRef, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, useMemo, useRef} from 'react';
 
 export interface ColorAreaRenderProps {
   /**
@@ -66,7 +66,7 @@ export const ColorArea = forwardRef(function ColorArea(props: ColorAreaProps, re
       <Provider
         values={[
           [ColorAreaStateContext, state],
-          [InternalColorThumbContext, {state, thumbProps, inputXRef, xInputProps, inputYRef, yInputProps, isDisabled: props.isDisabled}]
+          [InternalColorThumbContext, useMemo(() => ({state, thumbProps, inputXRef, xInputProps, inputYRef, yInputProps, isDisabled: props.isDisabled}), [props.isDisabled, state, thumbProps, xInputProps, yInputProps])]
         ]}>
         {renderProps.children}
       </Provider>

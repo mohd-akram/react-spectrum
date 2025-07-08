@@ -189,11 +189,11 @@ function ComboBoxInner<T extends object>({props, collection, comboBoxRef: ref}: 
     <Provider
       values={[
         [ComboBoxStateContext, state],
-        [LabelContext, {...labelProps, ref: labelRef}],
-        [ButtonContext, {...buttonProps, ref: buttonRef, isPressed: state.isOpen}],
-        [InputContext, {...inputProps, ref: inputRef}],
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef}), [labelProps, labelRef])],
+        [ButtonContext, useMemo(() => ({...buttonProps, ref: buttonRef, isPressed: state.isOpen}), [buttonProps, state.isOpen])],
+        [InputContext, useMemo(() => ({...inputProps, ref: inputRef}), [inputProps])],
         [OverlayTriggerStateContext, state],
-        [PopoverContext, {
+        [PopoverContext, useMemo(() => ({
           ref: popoverRef,
           triggerRef: inputRef,
           scrollRef: listBoxRef,
@@ -202,16 +202,16 @@ function ComboBoxInner<T extends object>({props, collection, comboBoxRef: ref}: 
           trigger: 'ComboBox',
           style: {'--trigger-width': menuWidth} as React.CSSProperties,
           clearContexts: CLEAR_CONTEXTS
-        }],
-        [ListBoxContext, {...listBoxProps, ref: listBoxRef}],
+        } as const), [menuWidth])],
+        [ListBoxContext, useMemo(() => ({...listBoxProps, ref: listBoxRef}), [listBoxProps])],
         [ListStateContext, state],
-        [TextContext, {
+        [TextContext, useMemo(() => ({
           slots: {
             description: descriptionProps,
             errorMessage: errorMessageProps
           }
-        }],
-        [GroupContext, {isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false}],
+        }), [descriptionProps, errorMessageProps])],
+        [GroupContext, useMemo(() => ({isInvalid: validation.isInvalid, isDisabled: props.isDisabled || false}), [props.isDisabled, validation.isInvalid])],
         [FieldErrorContext, validation]
       ]}>
       <div

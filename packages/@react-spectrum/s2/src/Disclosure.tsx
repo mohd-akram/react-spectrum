@@ -18,7 +18,7 @@ import {CenterBaseline} from './CenterBaseline';
 import {centerPadding, getAllowedOverrides, StyleProps, UnsafeStyles} from './style-utils' with { type: 'macro' };
 import Chevron from '../ui-icons/Chevron';
 import {filterDOMProps} from '@react-aria/utils';
-import React, {createContext, forwardRef, ReactNode, useContext} from 'react';
+import React, {createContext, forwardRef, ReactNode, useContext, useMemo} from 'react';
 import {useDOMRef} from '@react-spectrum/utils';
 import {useSpectrumContextProps} from './useSpectrumContextProps';
 
@@ -84,7 +84,7 @@ export const Disclosure = forwardRef(function Disclosure(props: DisclosureProps,
   return (
     <Provider
       values={[
-        [DisclosureContext, {size, isQuiet, density}]
+        [DisclosureContext, useMemo(() => ({size, isQuiet, density}), [density, isQuiet, size])]
       ]}>
       <RACDisclosure
         {...props}
@@ -99,7 +99,7 @@ export const Disclosure = forwardRef(function Disclosure(props: DisclosureProps,
 
 export interface DisclosureTitleProps extends UnsafeStyles, DOMProps {
   /** The heading level of the disclosure header.
-   * 
+   *
    * @default 3
    */
   level?: number,
@@ -229,7 +229,7 @@ function DisclosureHeaderWithForwardRef(props: DisclosureHeaderProps, ref: DOMRe
   return (
     <Provider
       values={[
-        [ActionButtonContext, {size: newSize, isQuiet}],
+        [ActionButtonContext, useMemo(() => ({size: newSize, isQuiet}), [isQuiet, newSize])],
         [InternalDisclosureHeader, {}]
       ]}>
       <div
@@ -338,4 +338,3 @@ export const DisclosurePanel = forwardRef(function DisclosurePanel(props: Disclo
     </RACDisclosurePanel>
   );
 });
-

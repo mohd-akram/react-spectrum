@@ -295,7 +295,7 @@ function TagGroupInner<T>({
           <Provider
             values={[
               [RACTextContext, undefined],
-              [TagGroupContext, {size, isEmphasized}]
+              [TagGroupContext, useMemo(() => ({size, isEmphasized}), [isEmphasized, size])]
             ]}>
             {/* invisible collection for measuring */}
             {maxRows != null && (
@@ -513,6 +513,25 @@ export const Tag = /*#__PURE__*/ (forwardRef as forwardRefType)(function Tag({ch
 
 function TagWrapper({children, isDisabled, allowsRemoving, isInRealDOM, isEmphasized, isSelected}) {
   let {size = 'M'} = useSlottedContext(TagGroupContext) ?? {};
+  const textContext = useMemo(() => ({styles: style({order: 1, truncate: true})}), []);
+  const iconContext = useMemo(() => ({
+    render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
+    styles: style({size: fontRelative(20), marginStart: '--iconMargin', flexShrink: 0})
+  }), []);
+  const avatarContext = useMemo(() => ({
+    size: avatarSize[size],
+    styles: style({order: 0})
+  }), [size]);
+  const imageContext = useMemo(() => ({
+    styles: style({
+      size: fontRelative(20),
+      flexShrink: 0,
+      order: 0,
+      aspectRatio: 'square',
+      objectFit: 'contain',
+      borderRadius: 'sm'
+    })
+  }), []);
   return (
     <>
       {isInRealDOM && (
@@ -527,25 +546,10 @@ function TagWrapper({children, isDisabled, allowsRemoving, isInRealDOM, isEmphas
         })}>
         <Provider
           values={[
-            [TextContext, {styles: style({order: 1, truncate: true})}],
-            [IconContext, {
-              render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
-              styles: style({size: fontRelative(20), marginStart: '--iconMargin', flexShrink: 0})
-            }],
-            [AvatarContext, {
-              size: avatarSize[size],
-              styles: style({order: 0})
-            }],
-            [ImageContext, {
-              styles: style({
-                size: fontRelative(20),
-                flexShrink: 0,
-                order: 0,
-                aspectRatio: 'square',
-                objectFit: 'contain',
-                borderRadius: 'sm'
-              })
-            }]
+            [TextContext, textContext],
+            [IconContext, iconContext],
+            [AvatarContext, avatarContext],
+            [ImageContext, imageContext]
           ]}>
           {children}
         </Provider>

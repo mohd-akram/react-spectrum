@@ -18,7 +18,7 @@ import {chain} from '@react-aria/utils';
 import {Content, Heading} from './Content';
 import {Dialog} from './Dialog';
 import {DOMProps, DOMRef} from '@react-types/shared';
-import {forwardRef, ReactNode} from 'react';
+import {forwardRef, ReactNode, useMemo} from 'react';
 import {IconContext} from './Icon';
 // @ts-ignore
 import intlMessages from '../intl/*.json';
@@ -101,6 +101,8 @@ export const AlertDialog = forwardRef(function AlertDialog(props: AlertDialogPro
     buttonVariant = 'negative';
   }
 
+  const iconContext = useMemo(() => ({styles: icon({variant})}), [variant]);
+
   return (
     <Dialog
       role="alertdialog"
@@ -112,7 +114,7 @@ export const AlertDialog = forwardRef(function AlertDialog(props: AlertDialogPro
         <>
           <Provider
             values={[
-              [IconContext, {styles: icon({variant})}]
+              [IconContext, iconContext]
             ]}>
             <Heading slot="title">
               <CenterBaseline>

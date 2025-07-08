@@ -17,7 +17,7 @@ import {Checkbox} from './Checkbox';
 import {color, focusRing, lightDark, space, style} from '../style' with {type: 'macro'};
 import {composeRenderProps, ContextValue, DEFAULT_SLOT, type GridListItem, GridListItemProps, Provider} from 'react-aria-components';
 import {ContentContext, FooterContext, TextContext} from './Content';
-import {createContext, CSSProperties, forwardRef, ReactNode, useContext} from 'react';
+import {createContext, CSSProperties, forwardRef, ReactNode, useContext, useMemo} from 'react';
 import {DividerContext} from './Divider';
 import {DOMProps, DOMRef, DOMRefValue, GlobalDOMAttributes} from '@react-types/shared';
 import {filterDOMProps, inertValue} from '@react-aria/utils';
@@ -386,25 +386,25 @@ export const Card = forwardRef(function Card(props: CardProps, ref: DOMRef<HTMLD
   let children = (
     <Provider
       values={[
-        [ImageContext, {alt: '', styles: image}],
-        [TextContext, {
+        [ImageContext, useMemo(() => ({alt: '', styles: image}), [])],
+        [TextContext, useMemo(() => ({
           slots: {
             [DEFAULT_SLOT]: {},
             title: {styles: title({size})},
             description: {styles: description({size})}
           }
-        }],
-        [ContentContext, {styles: content({size})}],
-        [DividerContext, {size: 'S'}],
-        [FooterContext, {styles: footer}],
-        [ActionMenuContext, {
+        }), [size])],
+        [ContentContext, useMemo(() => ({styles: content({size})}), [size])],
+        [DividerContext, useMemo(() => ({size: 'S'} as const), [])],
+        [FooterContext, useMemo(() => ({styles: footer}), [])],
+        [ActionMenuContext, useMemo(() => ({
           isQuiet: true,
           size: actionButtonSize[size],
           isDisabled: isSkeleton,
           // @ts-ignore
           'data-slot': 'menu',
           styles: actionMenu
-        }],
+        }), [isSkeleton, size])],
         [SkeletonContext, isSkeleton]
       ]}>
       <ImageCoordinator>
@@ -560,45 +560,47 @@ export const CollectionCardPreview = forwardRef(function CollectionCardPreview(p
 export interface AssetCardProps extends Omit<CardProps, 'density'> {}
 
 export const AssetCard = forwardRef(function AssetCard(props: AssetCardProps, ref: DOMRef<HTMLDivElement>) {
+  const imageContext = useMemo(() => ({
+    alt: '',
+    styles: style({
+      width: 'full',
+      aspectRatio: 'square',
+      objectFit: 'contain',
+      pointerEvents: 'none',
+      userSelect: 'none'
+    })
+  }), []);
+  const illustrationContext = useMemo(() => ({
+    render(icon) {
+      return (
+        <SkeletonWrapper>
+          <div
+            className={style({
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'gray-100',
+              aspectRatio: 'square'
+            })}>
+            {icon}
+          </div>
+        </SkeletonWrapper>
+      );
+    },
+    styles: style({
+      height: 'auto',
+      maxSize: 160,
+      // TODO: this is made up.
+      width: '50%'
+    })
+  }), []);
   return (
     <Card {...props} ref={ref} density="regular">
       {composeRenderProps(props.children, children => (
         <Provider
           values={[
-            [ImageContext, {
-              alt: '',
-              styles: style({
-                width: 'full',
-                aspectRatio: 'square',
-                objectFit: 'contain',
-                pointerEvents: 'none',
-                userSelect: 'none'
-              })
-            }],
-            [IllustrationContext, {
-              render(icon) {
-                return (
-                  <SkeletonWrapper>
-                    <div
-                      className={style({
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'gray-100',
-                        aspectRatio: 'square'
-                      })}>
-                      {icon}
-                    </div>
-                  </SkeletonWrapper>
-                );
-              },
-              styles: style({
-                height: 'auto',
-                maxSize: 160,
-                // TODO: this is made up.
-                width: '50%'
-              })
-            }]
+            [ImageContext, imageContext],
+            [IllustrationContext, illustrationContext]
           ]}>
           {children}
         </Provider>
@@ -622,35 +624,37 @@ export interface UserCardProps extends Omit<CardProps, 'density' | 'variant'> {
 
 export const UserCard = forwardRef(function UserCard(props: CardProps, ref: DOMRef<HTMLDivElement>) {
   let {size = 'M'} = props;
+  const imageContext = useMemo(() => ({
+    alt: '',
+    styles: style({
+      width: 'full',
+      aspectRatio: '3/1',
+      objectFit: 'cover',
+      pointerEvents: 'none',
+      userSelect: 'none'
+    })
+  }), []);
+  const avatarContext = useMemo(() => ({
+    size: avatarSize[size],
+    UNSAFE_style: {
+      '--size': (avatarSize[size] / 16) + 'rem'
+    } as CSSProperties,
+    styles: style({
+      position: 'relative',
+      marginTop: {
+        default: 0,
+        ':is([slot=preview] + *)': 'calc(var(--size) / -2)'
+      }
+    }),
+    isOverBackground: true
+  }), [size]);
   return (
     <Card {...props} ref={ref} density="spacious">
       {composeRenderProps(props.children, children => (
         <Provider
           values={[
-            [ImageContext, {
-              alt: '',
-              styles: style({
-                width: 'full',
-                aspectRatio: '3/1',
-                objectFit: 'cover',
-                pointerEvents: 'none',
-                userSelect: 'none'
-              })
-            }],
-            [AvatarContext, {
-              size: avatarSize[size],
-              UNSAFE_style: {
-                '--size': (avatarSize[size] / 16) + 'rem'
-              } as CSSProperties,
-              styles: style({
-                position: 'relative',
-                marginTop: {
-                  default: 0,
-                  ':is([slot=preview] + *)': 'calc(var(--size) / -2)'
-                }
-              }),
-              isOverBackground: true
-            }]
+            [ImageContext, imageContext],
+            [AvatarContext, avatarContext]
           ]}>
           {children}
         </Provider>
@@ -674,69 +678,72 @@ export interface ProductCardProps extends Omit<CardProps, 'density' | 'variant'>
 
 export const ProductCard = forwardRef(function ProductCard(props: ProductCardProps, ref: DOMRef<HTMLDivElement>) {
   let {size = 'M'} = props;
+  const imageContext = useMemo(() => ({
+    slots: {
+      preview: {
+        alt: '',
+        styles: style({
+          width: 'full',
+          aspectRatio: '5/1',
+          objectFit: 'cover',
+          pointerEvents: 'none',
+          userSelect: 'none'
+        })
+      },
+      thumbnail: {
+        alt: '',
+        styles: style({
+          position: 'relative',
+          pointerEvents: 'none',
+          userSelect: 'none',
+          size: {
+            size: {
+              XS: 24,
+              S: 36,
+              M: 40,
+              L: 44,
+              XL: 56
+            }
+          },
+          borderRadius: {
+            default: 'default',
+            size: {
+              XS: 'sm',
+              S: 'sm'
+            }
+          },
+          objectFit: 'cover',
+          marginTop: {
+            default: 0,
+            ':is([slot=preview] + *)': 'calc(self(height) / -2)'
+          },
+          outlineStyle: 'solid',
+          outlineWidth: {
+            default: 2,
+            size: {
+              XS: 1
+            }
+          },
+          outlineColor: '--s2-container-bg'
+        })({size})
+      }
+    }
+  }), [size]);
+  const footerContext = useMemo(() => ({
+    styles: mergeStyles(footer, style({
+      justifyContent: 'end'
+    }))
+  }), []);
+  const buttonContext = useMemo(() => ({size: buttonSize[size]}), [size]);
   return (
     <Card {...props} ref={ref} density="spacious">
       {composeRenderProps(props.children, children => (
         <Provider
           values={[
-            [ImageContext, {
-              slots: {
-                preview: {
-                  alt: '',
-                  styles: style({
-                    width: 'full',
-                    aspectRatio: '5/1',
-                    objectFit: 'cover',
-                    pointerEvents: 'none',
-                    userSelect: 'none'
-                  })
-                },
-                thumbnail: {
-                  alt: '',
-                  styles: style({
-                    position: 'relative',
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                    size: {
-                      size: {
-                        XS: 24,
-                        S: 36,
-                        M: 40,
-                        L: 44,
-                        XL: 56
-                      }
-                    },
-                    borderRadius: {
-                      default: 'default',
-                      size: {
-                        XS: 'sm',
-                        S: 'sm'
-                      }
-                    },
-                    objectFit: 'cover',
-                    marginTop: {
-                      default: 0,
-                      ':is([slot=preview] + *)': 'calc(self(height) / -2)'
-                    },
-                    outlineStyle: 'solid',
-                    outlineWidth: {
-                      default: 2,
-                      size: {
-                        XS: 1
-                      }
-                    },
-                    outlineColor: '--s2-container-bg'
-                  })({size})
-                }
-              }
-            }],
-            [FooterContext, {
-              styles: mergeStyles(footer, style({
-                justifyContent: 'end'
-              }))
-            }],
-            [ButtonContext, {size: buttonSize[size]}],
-            [LinkButtonContext, {size: buttonSize[size]}]
+            [ImageContext, imageContext],
+            [FooterContext, footerContext],
+            [ButtonContext, buttonContext],
+            [LinkButtonContext, buttonContext]
           ]}>
           {children}
         </Provider>

@@ -187,7 +187,7 @@ function ModalOverlayInner({UNSTABLE_portalContainer, ...props}: ModalOverlayInn
         data-exiting={props.isExiting || undefined}>
         <Provider
           values={[
-            [InternalModalContext, {modalProps, modalRef, isExiting: props.isExiting, isDismissable: props.isDismissable}],
+            [InternalModalContext, useMemo(() => ({modalProps, modalRef, isExiting: props.isExiting, isDismissable: props.isDismissable}), [modalProps, modalRef, props.isDismissable, props.isExiting])],
             [OverlayTriggerStateContext, state]
           ]}>
           {renderProps.children}

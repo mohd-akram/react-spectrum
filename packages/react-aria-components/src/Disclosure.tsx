@@ -16,7 +16,7 @@ import {ContextValue, DEFAULT_SLOT, Provider, RenderProps, SlotProps, useContext
 import {DisclosureGroupState, DisclosureState, DisclosureGroupProps as StatelyDisclosureGroupProps, useDisclosureGroupState, useDisclosureState} from 'react-stately';
 import {DOMProps, forwardRefType, GlobalDOMAttributes, Key} from '@react-types/shared';
 import {filterDOMProps, mergeProps, mergeRefs, useId} from '@react-aria/utils';
-import React, {createContext, DOMAttributes, ForwardedRef, forwardRef, ReactNode, useContext} from 'react';
+import React, {createContext, DOMAttributes, ForwardedRef, forwardRef, ReactNode, useContext, useMemo} from 'react';
 
 export interface DisclosureGroupProps extends StatelyDisclosureGroupProps, RenderProps<DisclosureGroupRenderProps>, DOMProps, GlobalDOMAttributes<HTMLDivElement> {}
 
@@ -157,13 +157,13 @@ export const Disclosure = /*#__PURE__*/ (forwardRef as forwardRefType)(function 
   return (
     <Provider
       values={[
-        [ButtonContext, {
+        [ButtonContext, useMemo(() => ({
           slots: {
             [DEFAULT_SLOT]: {},
             trigger: buttonProps
           }
-        }],
-        [InternalDisclosureContext, {panelProps, panelRef}],
+        }), [buttonProps])],
+        [InternalDisclosureContext, useMemo(() => ({panelProps, panelRef}), [panelProps])],
         [DisclosureStateContext, state]
       ]}>
       <div

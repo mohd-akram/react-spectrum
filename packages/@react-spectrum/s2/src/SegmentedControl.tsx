@@ -15,7 +15,7 @@ import {baseColor, focusRing, style} from '../style' with {type: 'macro'};
 import {centerBaseline} from './CenterBaseline';
 import {ContextValue, DEFAULT_SLOT, Provider, TextContext as RACTextContext, SlotProps, ToggleButton, ToggleButtonGroup, ToggleButtonRenderProps, ToggleGroupStateContext} from 'react-aria-components';
 import {control, getAllowedOverrides, StyleProps} from './style-utils' with {type: 'macro'};
-import {createContext, forwardRef, ReactNode, RefObject, useCallback, useContext, useRef} from 'react';
+import {createContext, forwardRef, ReactNode, RefObject, useCallback, useContext, useMemo, useRef} from 'react';
 import {IconContext} from './Icon';
 import {pressScale} from './pressScale';
 import {Text, TextContext} from './Content';
@@ -209,7 +209,7 @@ function DefaultSelectionTracker(props: DefaultSelectionTrackProps) {
   return (
     <Provider
       values={[
-        [InternalSegmentedControlContext, {register: register, prevRef: props.prevRef, currentSelectedRef: props.currentSelectedRef, isJustified: props.isJustified}]
+        [InternalSegmentedControlContext, useMemo(() => ({register: register, prevRef: props.prevRef, currentSelectedRef: props.currentSelectedRef, isJustified: props.isJustified}), [props.currentSelectedRef, props.isJustified, props.prevRef, register])]
       ]}>
       {props.children}
     </Provider>
@@ -253,6 +253,14 @@ export const SegmentedControlItem = /*#__PURE__*/ forwardRef(function SegmentedC
     }
   }, [isSelected, reduceMotion, prevRef, currentSelectedRef]);
 
+  const iconContext = useMemo(() => ({
+    render: centerBaseline({slot: 'icon', styles: style({order: 0, flexShrink: 0})})
+  }), []);
+
+  const racTextContext = useMemo(() => ({slots: {[DEFAULT_SLOT]: {}}}), []);
+
+  const textContext = useMemo(() => ({styles: style({order: 1, truncate: true})}), []);
+
   return (
     <ToggleButton
       {...props}
@@ -264,11 +272,9 @@ export const SegmentedControlItem = /*#__PURE__*/ forwardRef(function SegmentedC
           {isSelected && <div className={slider({isDisabled})} ref={currentSelectedRef} />}
           <Provider
             values={[
-              [IconContext, {
-                render: centerBaseline({slot: 'icon', styles: style({order: 0, flexShrink: 0})})
-              }],
-              [RACTextContext, {slots: {[DEFAULT_SLOT]: {}}}],
-              [TextContext, {styles: style({order: 1, truncate: true})}]
+              [IconContext, iconContext],
+              [RACTextContext, racTextContext],
+              [TextContext, textContext]
             ]}>
             <div ref={divRef} style={pressScale(divRef)({isPressed})} className={style({display: 'flex', gap: 'text-to-visual', transition: 'default', alignItems: 'center', minWidth: 0})}>
               {typeof props.children === 'string' ? <Text>{props.children}</Text> : props.children}

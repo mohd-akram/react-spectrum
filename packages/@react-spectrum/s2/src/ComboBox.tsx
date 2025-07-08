@@ -374,6 +374,11 @@ export function ComboBoxItem(props: ComboBoxItemProps): ReactNode {
   let ref = useRef(null);
   let isLink = props.href != null;
   let {size} = useContext(InternalComboboxContext);
+  const iconContext = useMemo(() => ({
+    slots: {
+      icon: {render: centerBaseline({slot: 'icon', styles: iconCenterWrapper}), styles: icon}
+    }
+  }), []);
   return (
     <ListBoxItem
       {...props}
@@ -387,11 +392,7 @@ export function ComboBoxItem(props: ComboBoxItemProps): ReactNode {
           <>
             <Provider
               values={[
-                [IconContext, {
-                  slots: {
-                    icon: {render: centerBaseline({slot: 'icon', styles: iconCenterWrapper}), styles: icon}
-                  }
-                }],
+                [IconContext, iconContext],
                 [TextContext, {
                   slots: {
                     label: {styles: label({size})},
@@ -660,17 +661,17 @@ const ComboboxInner = forwardRef(function ComboboxInner(props: ComboBoxProps<any
           })}>
           <Provider
             values={[
-              [HeaderContext, {styles: listboxHeader({size})}],
-              [HeadingContext, {
+              [HeaderContext, useMemo(() => ({styles: listboxHeader({size})}), [size])],
+              [HeadingContext, useMemo(() => ({
                 // @ts-ignore
                 role: 'presentation',
                 styles: sectionHeading
-              }],
-              [TextContext, {
+              }), [])],
+              [TextContext, useMemo(() => ({
                 slots: {
                   'description': {styles: description({size})}
                 }
-              }]
+              }), [size])]
             ]}>
             <Virtualizer
               layout={ListLayout}

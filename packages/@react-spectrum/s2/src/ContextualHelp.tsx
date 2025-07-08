@@ -2,7 +2,7 @@ import {ActionButton} from './ActionButton';
 import {AriaLabelingProps, DOMProps, FocusableRef, FocusableRefValue} from '@react-types/shared';
 import {ContentContext, FooterContext, HeadingContext} from './Content';
 import {ContextValue, DEFAULT_SLOT, Provider, Dialog as RACDialog, TextContext} from 'react-aria-components';
-import {createContext, forwardRef, ReactNode} from 'react';
+import {createContext, forwardRef, ReactNode, useMemo} from 'react';
 import {dialogInner} from './Dialog';
 import {DialogTrigger, DialogTriggerProps} from './DialogTrigger';
 import {filterDOMProps, mergeProps, useLabels} from '@react-aria/utils';
@@ -107,23 +107,23 @@ export const ContextualHelp = forwardRef(function ContextualHelp(props: Contextu
         <RACDialog className={mergeStyles(dialogInner, style({borderRadius: 'none', margin: 'calc(self(paddingTop) * -1)', padding: 24}))}>
           <Provider
             values={[
-              [TextContext, {
+              [TextContext, useMemo(() => ({
                 slots: {
                   [DEFAULT_SLOT]: {}
                 }
-              }],
-              [HeadingContext, {styles: style({
+              }), [])],
+              [HeadingContext, useMemo(() => ({styles: style({
                 font: 'heading-xs',
                 margin: 0,
                 marginBottom: space(8) // This only makes it 10px on mobile and should be 12px
-              })}],
-              [ContentContext, {styles: style({
+              })}), [])],
+              [ContentContext, useMemo(() => ({styles: style({
                 font: 'body-sm'
-              })}],
-              [FooterContext, {styles: style({
+              })}), [])],
+              [FooterContext, useMemo(() => ({styles: style({
                 font: 'body-sm',
                 marginTop: 16
-              })}]
+              })}), [])]
             ]}>
             {children}
           </Provider>

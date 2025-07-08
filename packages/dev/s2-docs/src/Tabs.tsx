@@ -16,7 +16,7 @@ import {
 // import {centerBaseline} from './CenterBaseline';
 import {baseColor, focusRing, style}  from '@react-spectrum/s2/style' with {type: 'macro'};
 import {DOMRef} from '@react-types/shared';
-import {forwardRef, ReactNode, useCallback, useContext, useRef, useState} from 'react';
+import {forwardRef, ReactNode, useCallback, useContext, useMemo, useRef, useState} from 'react';
 import {IconContext, TextContext} from '@react-spectrum/s2';
 import {useDOMRef} from '@react-spectrum/utils';
 import {useId, useLayoutEffect} from '@react-aria/utils';
@@ -203,14 +203,14 @@ export function Tab(props: TabProps): ReactNode {
       className={renderProps => tab({...renderProps})}>
       <Provider
         values={[
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             id: contentId,
             styles: style({order: 1})
-          }],
-          [IconContext, {
+          }), [contentId])],
+          [IconContext, useMemo(() => ({
             // render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
             styles: icon
-          }]
+          }), [])]
         ]}>
         {props.children}
       </Provider>

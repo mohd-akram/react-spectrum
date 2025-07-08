@@ -252,10 +252,10 @@ function ListBoxInner<T extends object>({state: inputState, props, listBoxRef}: 
           values={[
             [ListBoxContext, props],
             [ListStateContext, state],
-            [DragAndDropContext, {dragAndDropHooks, dragState, dropState}],
-            [SeparatorContext, {elementType: 'div'}],
-            [DropIndicatorContext, {render: ListBoxDropIndicatorWrapper}],
-            [SectionContext, {name: 'ListBoxSection', render: ListBoxSectionInner}]
+            [DragAndDropContext, useMemo(() => ({dragAndDropHooks, dragState, dropState}), [dragAndDropHooks, dragState, dropState])],
+            [SeparatorContext, useMemo(() => ({elementType: 'div'}), [])],
+            [DropIndicatorContext, useMemo(() => ({render: ListBoxDropIndicatorWrapper}), [])],
+            [SectionContext, useMemo(() => ({name: 'ListBoxSection', render: ListBoxSectionInner}), [])]
           ]}>
           <CollectionRoot
             collection={collection}
@@ -407,13 +407,13 @@ export const ListBoxItem = /*#__PURE__*/ createLeafComponent('item', function Li
       data-selection-mode={state.selectionManager.selectionMode === 'none' ? undefined : state.selectionManager.selectionMode}>
       <Provider
         values={[
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             slots: {
               [DEFAULT_SLOT]: labelProps,
               label: labelProps,
               description: descriptionProps
             }
-          }]
+          }), [descriptionProps, labelProps])]
         ]}>
         {renderProps.children}
       </Provider>

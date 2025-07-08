@@ -132,7 +132,7 @@ export const Tabs = forwardRef(function Tabs(props: TabsProps, ref: DOMRef<HTMLD
   return (
     <Provider
       values={[
-        [InternalTabsContext, {
+        [InternalTabsContext, useMemo(() => ({
           density,
           isDisabled,
           orientation,
@@ -144,7 +144,7 @@ export const Tabs = forwardRef(function Tabs(props: TabsProps, ref: DOMRef<HTMLD
           labelBehavior,
           'aria-label': props['aria-label'],
           'aria-labelledby': props['aria-labelledby']
-        }]
+        }), [density, disabledKeys, isDisabled, labelBehavior, onChange, orientation, props, value])]
       ]}>
       <CollectionBuilder content={props.children}>
         {collection => (
@@ -337,6 +337,24 @@ export function Tab(props: TabProps): ReactNode {
   let contentId = useId();
   let ariaLabelledBy = props['aria-labelledby'] || '';
 
+  const textContext = useMemo(() => ({
+    id: contentId,
+    styles:
+      style({
+        order: 1,
+        display: {
+          labelBehavior: {
+            hide: 'none'
+          }
+        }
+      })({labelBehavior})
+  }), [contentId, labelBehavior]);
+
+  const iconContext = useMemo(() => ({
+    render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
+    styles: icon
+  }), []);
+
   return (
     <RACTab
       {...props}
@@ -357,22 +375,8 @@ export function Tab(props: TabProps): ReactNode {
           return (
             <Provider
               values={[
-                [TextContext, {
-                  id: contentId,
-                  styles:
-                    style({
-                      order: 1,
-                      display: {
-                        labelBehavior: {
-                          hide: 'none'
-                        }
-                      }
-                    })({labelBehavior})
-                }],
-                [IconContext, {
-                  render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
-                  styles: icon
-                }]
+                [TextContext, textContext],
+                [IconContext, iconContext]
               ]}>
               <TabInner
                 isSelected={isSelected}

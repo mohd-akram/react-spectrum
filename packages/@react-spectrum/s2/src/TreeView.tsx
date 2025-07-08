@@ -39,7 +39,7 @@ import {IconContext} from './Icon';
 import intlMessages from '../intl/*.json';
 import {ProgressCircle} from './ProgressCircle';
 import {raw} from '../style/style-macro' with {type: 'macro'};
-import React, {createContext, forwardRef, JSXElementConstructor, ReactElement, ReactNode, useContext, useRef} from 'react';
+import React, {createContext, forwardRef, JSXElementConstructor, ReactElement, ReactNode, useContext, useMemo, useRef} from 'react';
 import {TextContext} from './Content';
 import {useDOMRef} from '@react-spectrum/utils';
 import {useLocale, useLocalizedStringFormatter} from 'react-aria';
@@ -335,7 +335,13 @@ export const TreeViewItemContent = (props: TreeViewItemContentProps): ReactNode 
   } = props;
   let {isDetached, isEmphasized} = useContext(InternalTreeContext);
   let scale = useScale();
-
+  const textContext = useMemo(() => ({styles: treeContent}), []);
+  const iconContext = useMemo(() => ({
+    render: centerBaseline({slot: 'icon', styles: treeIcon}),
+    styles: style({size: fontRelative(20), flexShrink: 0})
+  }), []);
+  const actionButtonGroupContext = useMemo(() => ({styles: treeActions}), []);
+  const actionMenuContext = useMemo(() => ({styles: treeActionMenu, isQuiet: true}), []);
   return (
     <TreeItemContent>
       {({isExpanded, hasChildItems, selectionMode, selectionBehavior, isDisabled, isFocusVisible, isSelected, id, state}) => {
@@ -364,13 +370,10 @@ export const TreeViewItemContent = (props: TreeViewItemContentProps): ReactNode 
             <ExpandableRowChevron isDisabled={isDisabled} isExpanded={isExpanded} scale={scale} isHidden={!(hasChildItems)} />
             <Provider
               values={[
-                [TextContext, {styles: treeContent}],
-                [IconContext, {
-                  render: centerBaseline({slot: 'icon', styles: treeIcon}),
-                  styles: style({size: fontRelative(20), flexShrink: 0})
-                }],
-                [ActionButtonGroupContext, {styles: treeActions}],
-                [ActionMenuContext, {styles: treeActionMenu, isQuiet: true}]
+                [TextContext, textContext],
+                [IconContext, iconContext],
+                [ActionButtonGroupContext, actionButtonGroupContext],
+                [ActionMenuContext, actionMenuContext]
               ]}>
               {children}
             </Provider>

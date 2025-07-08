@@ -16,7 +16,7 @@ import {DropOptions, mergeProps, useButton, useClipboard, useDrop, useFocusRing,
 import {filterDOMProps, isFocusable, useLabels, useObjectRef, useSlotId} from '@react-aria/utils';
 // @ts-ignore
 import intlMessages from '../intl/*.json';
-import React, {createContext, ForwardedRef, forwardRef, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, useMemo, useRef} from 'react';
 import {TextContext} from './Text';
 
 export interface DropZoneRenderProps {
@@ -94,7 +94,7 @@ export const DropZone = forwardRef(function DropZone(props: DropZoneProps, ref: 
   return (
     <Provider
       values={[
-        [TextContext, {id: textId, slot: 'label'}]
+        [TextContext, useMemo(() => ({id: textId, slot: 'label'}), [textId])]
       ]}>
       {/* eslint-disable-next-line */}
       <div

@@ -15,7 +15,7 @@ import {ContextValue, Provider, RenderProps, SlotProps, useContextProps, useRend
 import {filterDOMProps} from '@react-aria/utils';
 import {forwardRefType, GlobalDOMAttributes, RefObject} from '@react-types/shared';
 import {LabelContext} from './Label';
-import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, OutputHTMLAttributes, useContext, useRef} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, OutputHTMLAttributes, useContext, useMemo, useRef} from 'react';
 import {SliderState, useSliderState} from 'react-stately';
 
 export interface SliderProps<T = number | number[]> extends Omit<AriaSliderProps<T>, 'label'>, RenderProps<SliderRenderProps>, SlotProps, GlobalDOMAttributes<HTMLDivElement> {
@@ -82,9 +82,9 @@ export const Slider = /*#__PURE__*/ (forwardRef as forwardRefType)(function Slid
     <Provider
       values={[
         [SliderStateContext, state],
-        [SliderTrackContext, {...trackProps, ref: trackRef}],
+        [SliderTrackContext, useMemo(() => ({...trackProps, ref: trackRef}), [trackProps])],
         [SliderOutputContext, outputProps],
-        [LabelContext, {...labelProps, ref: labelRef}]
+        [LabelContext, useMemo(() => ({...labelProps, ref: labelRef}), [labelProps, labelRef])]
       ]}>
       <div
         {...mergeProps(DOMProps, renderProps, groupProps)}
@@ -267,7 +267,7 @@ export const SliderThumb = /*#__PURE__*/ (forwardRef as forwardRefType)(function
       </VisuallyHidden>
       <Provider
         values={[
-          [LabelContext, {...labelProps, ref: labelRef}]
+          [LabelContext, useMemo(() => ({...labelProps, ref: labelRef}), [labelProps, labelRef])]
         ]}>
         {renderProps.children}
       </Provider>

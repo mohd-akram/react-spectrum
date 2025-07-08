@@ -162,13 +162,13 @@ export const RadioGroup = /*#__PURE__*/ (forwardRef as forwardRefType)(function 
       <Provider
         values={[
           [RadioGroupStateContext, state],
-          [LabelContext, {...labelProps, ref: labelRef, elementType: 'span'}],
-          [TextContext, {
+          [LabelContext, useMemo(() => ({...labelProps, ref: labelRef, elementType: 'span'}), [labelProps, labelRef])],
+          [TextContext, useMemo(() => ({
             slots: {
               description: descriptionProps,
               errorMessage: errorMessageProps
             }
-          }],
+          }), [descriptionProps, errorMessageProps])],
           [FieldErrorContext, validation]
         ]}>
         {renderProps.children}

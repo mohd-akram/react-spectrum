@@ -18,7 +18,7 @@ import {HeadingContext} from './RSPContexts';
 import {OverlayTriggerProps, OverlayTriggerState, useMenuTriggerState} from 'react-stately';
 import {PopoverContext} from './Popover';
 import {PressResponder} from '@react-aria/interactions';
-import React, {createContext, ForwardedRef, forwardRef, JSX, ReactNode, useCallback, useContext, useRef, useState} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, JSX, ReactNode, useCallback, useContext, useMemo, useRef, useState} from 'react';
 import {RootMenuTriggerStateContext} from './Menu';
 
 export interface DialogTriggerProps extends OverlayTriggerProps {
@@ -74,12 +74,12 @@ export function DialogTrigger(props: DialogTriggerProps): JSX.Element {
         [OverlayTriggerStateContext, state],
         [RootMenuTriggerStateContext, state],
         [DialogContext, overlayProps],
-        [PopoverContext, {
+        [PopoverContext, useMemo(() => ({
           trigger: 'DialogTrigger',
           triggerRef: buttonRef,
           'aria-labelledby': overlayProps['aria-labelledby'],
           style: {'--trigger-width': buttonWidth} as React.CSSProperties
-        }]
+        }), [buttonWidth, overlayProps])]
       ]}>
       <PressResponder {...triggerProps} ref={buttonRef} isPressed={state.isOpen}>
         {props.children}
@@ -131,20 +131,20 @@ export const Dialog = /*#__PURE__*/ (forwardRef as forwardRefType)(function Dial
       slot={props.slot || undefined}>
       <Provider
         values={[
-          [HeadingContext, {
+          [HeadingContext, useMemo(() => ({
             slots: {
               [DEFAULT_SLOT]: {},
               title: {...titleProps, level: 2}
             }
-          }],
-          [ButtonContext, {
+          }), [titleProps])],
+          [ButtonContext, useMemo(() => ({
             slots: {
               [DEFAULT_SLOT]: {},
               close: {
                 onPress: () => state?.close()
               }
             }
-          }]
+          }), [state])]
         ]}>
         {renderProps.children}
       </Provider>

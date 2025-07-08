@@ -17,7 +17,7 @@ import {createPortal} from 'react-dom';
 import {filterDOMProps, useObjectRef} from '@react-aria/utils';
 import {forwardRefType, GlobalDOMAttributes} from '@react-types/shared';
 import {QueuedToast, ToastQueue, ToastState, useToastQueue} from 'react-stately';
-import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, JSX, ReactElement, ReactNode, useContext} from 'react';
+import React, {createContext, ForwardedRef, forwardRef, HTMLAttributes, JSX, ReactElement, ReactNode, useContext, useMemo} from 'react';
 import {TextContext} from './Text';
 import {useIsSSR} from '@react-aria/ssr';
 import {useUNSAFE_PortalContext} from '@react-aria/overlays';
@@ -189,19 +189,19 @@ export const Toast = /*#__PURE__*/ (forwardRef as forwardRefType)(function Toast
       <Provider
         values={[
           [ToastContentContext, contentProps],
-          [TextContext, {
+          [TextContext, useMemo(() => ({
             slots: {
               [DEFAULT_SLOT]: {},
               title: titleProps,
               description: descriptionProps
             }
-          }],
-          [ButtonContext, {
+          }), [descriptionProps, titleProps])],
+          [ButtonContext, useMemo(() => ({
             slots: {
               [DEFAULT_SLOT]: {},
               close: closeButtonProps
             }
-          }]
+          }), [closeButtonProps])]
         ]}>
         {renderProps.children}
       </Provider>

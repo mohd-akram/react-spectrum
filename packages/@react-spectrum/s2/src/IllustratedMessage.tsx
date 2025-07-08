@@ -14,7 +14,7 @@ import {ButtonGroupContext} from './ButtonGroup';
 import {ContentContext, HeadingContext} from './Content';
 import {ContextValue, Provider} from 'react-aria-components';
 import {controlFont, getAllowedOverrides, StylesPropWithHeight, UnsafeStyles} from './style-utils' with {type: 'macro'};
-import {createContext, forwardRef, ReactNode} from 'react';
+import {createContext, forwardRef, ReactNode, useMemo} from 'react';
 import {DOMProps, DOMRef, DOMRefValue} from '@react-types/shared';
 import {filterDOMProps} from '@react-aria/utils';
 import {IllustrationContext} from './Icon';
@@ -178,10 +178,10 @@ export const IllustratedMessage = /*#__PURE__*/ forwardRef(function IllustratedM
       ref={domRef}>
       <Provider
         values={[
-          [HeadingContext, {styles: heading({orientation, size})}],
-          [ContentContext, {styles: content({size})}],
-          [IllustrationContext, {size: size === 'L' ? 'L' : 'M', styles: illustration({orientation, size, isInDropZone, isDropTarget})}],
-          [ButtonGroupContext, {styles: buttonGroup}]
+          [HeadingContext, useMemo(() => ({styles: heading({orientation, size})}), [orientation, size])],
+          [ContentContext, useMemo(() => ({styles: content({size})}), [size])],
+          [IllustrationContext, useMemo(() => ({size: size === 'L' ? 'L' : 'M', styles: illustration({orientation, size, isInDropZone, isDropTarget})} as const), [isDropTarget, isInDropZone, orientation, size])],
+          [ButtonGroupContext, useMemo(() => ({styles: buttonGroup}), [])]
         ]}>
         {children}
       </Provider>

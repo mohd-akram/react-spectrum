@@ -18,7 +18,7 @@ import {CenterBaseline, centerBaseline, centerBaselineBefore} from './CenterBase
 import {composeRenderProps, FieldError, FieldErrorProps, Group, GroupProps, Label, LabelProps, Provider, Input as RACInput, InputProps as RACInputProps, Text} from 'react-aria-components';
 import {ContextualHelpContext} from './ContextualHelp';
 import {control, controlFont, fieldInput, fieldLabel, StyleProps, UnsafeStyles} from './style-utils' with {type: 'macro'};
-import {ForwardedRef, forwardRef, ReactNode} from 'react';
+import {ForwardedRef, forwardRef, ReactNode, useMemo} from 'react';
 import {IconContext} from './Icon';
 // @ts-ignore
 import intlMessages from '../intl/*.json';
@@ -313,7 +313,7 @@ export function FieldErrorIcon(props: {isDisabled?: boolean}): ReactNode {
   return (
     <Provider
       values={[
-        [IconContext, {
+        [IconContext, useMemo(() => ({
           render: centerBaseline({
             slot: 'icon',
             styles: style({
@@ -333,7 +333,7 @@ export function FieldErrorIcon(props: {isDisabled?: boolean}): ReactNode {
             marginEnd: fontRelative(-2),
             flexShrink: 0
           })
-        }]
+        }), [])]
       ]}>
       {!props.isDisabled && <AlertIcon />}
     </Provider>

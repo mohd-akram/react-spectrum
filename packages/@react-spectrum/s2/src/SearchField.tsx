@@ -19,7 +19,7 @@ import {
 import {baseColor, fontRelative, style} from '../style' with {type: 'macro'};
 import {centerBaseline} from './CenterBaseline';
 import {ClearButton} from './ClearButton';
-import {createContext, forwardRef, Ref, useContext, useImperativeHandle, useRef} from 'react';
+import {createContext, forwardRef, Ref, useContext, useImperativeHandle, useMemo, useRef} from 'react';
 import {createFocusableRef} from '@react-spectrum/utils';
 import {field, getAllowedOverrides, StyleProps} from './style-utils' with {type: 'macro'};
 import {FieldGroup, FieldLabel, HelpText, Input} from './Field';
@@ -77,6 +77,24 @@ export const SearchField = /*#__PURE__*/ forwardRef(function SearchField(props: 
     }
   }));
 
+  const iconContext = useMemo(() => ({
+    render: centerBaseline({
+      slot: 'icon',
+      styles: style({
+        flexShrink: 0,
+        marginEnd: 'text-to-visual',
+        '--iconPrimary': {
+          type: 'fill',
+          value: 'currentColor'
+        }
+      })
+    }),
+    styles: style({
+      size: fontRelative(20),
+      marginStart: '--iconMargin'
+    })
+  }), []);
+
   return (
     <AriaSearchField
       {...searchFieldProps}
@@ -121,23 +139,7 @@ export const SearchField = /*#__PURE__*/ forwardRef(function SearchField(props: 
           })}>
           <Provider
             values={[
-              [IconContext, {
-                render: centerBaseline({
-                  slot: 'icon',
-                  styles: style({
-                    flexShrink: 0,
-                    marginEnd: 'text-to-visual',
-                    '--iconPrimary': {
-                      type: 'fill',
-                      value: 'currentColor'
-                    }
-                  })
-                }),
-                styles: style({
-                  size: fontRelative(20),
-                  marginStart: '--iconMargin'
-                })
-              }]
+              [IconContext, iconContext]
             ]}>
             <SearchIcon />
           </Provider>

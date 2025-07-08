@@ -17,7 +17,7 @@ import {control, getAllowedOverrides, StyleProps} from './style-utils' with {typ
 import {filterDOMProps} from '@react-aria/utils';
 import {fontRelative, lightDark, style} from '../style' with {type: 'macro'};
 import {IconContext} from './Icon';
-import React, {createContext, forwardRef, ReactNode} from 'react';
+import React, {createContext, forwardRef, ReactNode, useMemo} from 'react';
 import {SkeletonWrapper} from './Skeleton';
 import {Text, TextContext} from './Content';
 import {useDOMRef} from '@react-spectrum/utils';
@@ -181,7 +181,7 @@ export const Badge = forwardRef(function Badge(props: BadgeProps, ref: DOMRef<HT
   return (
     <Provider
       values={[
-        [TextContext, {
+        [TextContext, useMemo(() => ({
           styles: style({
             paddingY: '--labelPadding',
             order: 1,
@@ -190,12 +190,12 @@ export const Badge = forwardRef(function Badge(props: BadgeProps, ref: DOMRef<HT
             textOverflow: 'ellipsis',
             whiteSpace: {overflowMode: {truncate: 'nowrap', wrap: 'normal'}}
           })({overflowMode})
-        }],
-        [RACTextContext, {}],
-        [IconContext, {
+        }), [overflowMode])],
+        [RACTextContext, useMemo(() => ({}), [])],
+        [IconContext, useMemo(() => ({
           render: centerBaseline({slot: 'icon', styles: style({order: 0})}),
           styles: style({size: fontRelative(20), marginStart: '--iconMargin', flexShrink: 0})
-        }]
+        }), [])]
       ]}>
       <SkeletonWrapper>
         <span

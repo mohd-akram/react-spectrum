@@ -36,6 +36,7 @@ import {
   forwardRef,
   ReactNode,
   useContext,
+  useMemo,
   useRef
 } from 'react';
 import {DividerContext} from './Divider';
@@ -332,26 +333,26 @@ export const CoachMark = forwardRef((props: CoachMarkProps, ref: ForwardedRef<HT
   let children = (
     <Provider
       values={[
-        [ImageContext, {alt: '', styles: image}],
-        [TextContext, {
+        [ImageContext, useMemo(() => ({alt: '', styles: image}), [])],
+        [TextContext, useMemo(() => ({
           slots: {
             [DEFAULT_SLOT]: {},
             title: {styles: title({size})},
             description: {styles: description({size})},
             steps: {styles: steps}
           }
-        }],
-        [KeyboardContext, {styles: keyboard}],
-        [ContentContext, {styles: content({size})}],
-        [DividerContext, {size: 'S'}],
-        [FooterContext, {styles: footer}],
-        [ActionMenuContext, {
+        }), [size])],
+        [KeyboardContext, useMemo(() => ({styles: keyboard}), [])],
+        [ContentContext, useMemo(() => ({styles: content({size})}), [size])],
+        [DividerContext, useMemo(() => ({size: 'S'} as const), [])],
+        [FooterContext, useMemo(() => ({styles: footer}), [])],
+        [ActionMenuContext, useMemo(() => ({
           isQuiet: true,
           size: actionButtonSize[size],
           // @ts-ignore
           'data-slot': 'menu',
           styles: actionMenu
-        }]
+        }), [size])]
       ]}>
       <ImageCoordinator>
         {props.children}
@@ -410,7 +411,7 @@ export function CoachMarkTrigger(props: CoachMarkTriggerProps): ReactNode {
           [OverlayTriggerStateContext, state],
           [RootMenuTriggerStateContext, state],
           [DialogContext, overlayProps],
-          [PopoverContext, {trigger: 'DialogTrigger', triggerRef, isNonModal: true}] // valid to pass triggerRef?
+          [PopoverContext, useMemo(() => ({trigger: 'DialogTrigger', triggerRef, isNonModal: true}), [])] // valid to pass triggerRef?
       ]}>
       <PressResponder {...triggerProps} isPressed={state.isOpen}>
         <CoachMarkIndicator ref={triggerRef} isActive={state.isOpen}>
@@ -510,18 +511,18 @@ export const CoachMarkIndicator = /*#__PURE__*/ (forwardRef as forwardRefType)(f
     <div ref={objRef} className={indicator({isActive}) + ' ' + (isActive ? pulse : '')}>
       <Provider
         values={[
-          [ButtonContext, {
-            // @ts-ignore
+          // @ts-ignore
+          [ButtonContext, useMemo(() => ({
             'data-trigger': 'button'
-          }],
-          [CheckboxContext, {
-            // @ts-ignore
+          }), [])],
+          // @ts-ignore
+          [CheckboxContext, useMemo(() => ({
             'data-trigger': 'checkbox'
-          }],
-          [SliderContext, {
-            // @ts-ignore
+          }), [])],
+          // @ts-ignore
+          [SliderContext, useMemo(() => ({
             'data-trigger': 'slider'
-          }]
+          }), [])]
         ]}>
         {children}
       </Provider>

@@ -16,7 +16,7 @@ import {ColorSwatchContext} from './ColorSwatch';
 import {ColorSwatchPickerContext} from './ColorSwatchPicker';
 import {mergeProps} from 'react-aria';
 import {Provider, RenderProps, SlotProps, SlottedContextValue, useRenderProps, useSlottedContext} from './utils';
-import React, {createContext, JSX} from 'react';
+import React, {createContext, JSX, useMemo} from 'react';
 
 export interface ColorPickerRenderProps {
   /** The currently selected color. */
@@ -43,16 +43,18 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
     }
   });
 
+  const colorContext = useMemo(() => ({value: state.color, onChange: state.setColor}), [state.color, state.setColor]);
+
   return (
     <Provider
       values={[
         [ColorPickerStateContext, state],
-        [ColorSliderContext, {value: state.color, onChange: state.setColor}],
-        [ColorAreaContext, {value: state.color, onChange: state.setColor}],
-        [ColorWheelContext, {value: state.color, onChange: state.setColor}],
-        [ColorFieldContext, {value: state.color, onChange: state.setColor}],
-        [ColorSwatchContext, {color: state.color}],
-        [ColorSwatchPickerContext, {value: state.color, onChange: state.setColor}]
+        [ColorSliderContext, colorContext],
+        [ColorAreaContext, colorContext],
+        [ColorWheelContext, colorContext],
+        [ColorFieldContext, colorContext],
+        [ColorSwatchContext, useMemo(() => ({color: state.color}), [state.color])],
+        [ColorSwatchPickerContext, colorContext]
       ]}>
       {renderProps.children}
     </Provider>
